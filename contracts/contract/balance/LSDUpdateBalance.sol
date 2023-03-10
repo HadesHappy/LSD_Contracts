@@ -8,6 +8,8 @@ import "../../interface/balance/ILSDUpdateBalance.sol";
 import "../../interface/token/ILSDTokenLSETH.sol";
 import "../../interface/token/ILSDTokenVELSD.sol";
 import "../../interface/vault/ILSDRPVault.sol";
+import "../../interface/vault/ILSDLIDOVault.sol";
+import "../../interface/vault/ILSDSWISEVault.sol";
 
 contract LSDUpdateBalance is LSDBase, ILSDUpdateBalance {
     constructor(ILSDStorage _lsdStorageAddress) LSDBase(_lsdStorageAddress) {
@@ -25,11 +27,9 @@ contract LSDUpdateBalance is LSDBase, ILSDUpdateBalance {
     }
 
     // Update virtual ETH balance when deposit ETH
-    function addVirtualETHBalance(uint256 _amount)
-        public
-        override
-        onlyLSDContract("lsdTokenLSETH", msg.sender)
-    {
+    function addVirtualETHBalance(
+        uint256 _amount
+    ) public override onlyLSDContract("lsdTokenLSETH", msg.sender) {
         updateVirtualETHBalance();
         uint256 virtualETHBalance = getVirtualETHBalance();
         setVirtualETHBalance(virtualETHBalance + _amount);
@@ -39,11 +39,9 @@ contract LSDUpdateBalance is LSDBase, ILSDUpdateBalance {
     }
 
     // Update virtual ETH balance when withdraw ETH
-    function subVirtualETHBalance(uint256 _amount)
-        public
-        override
-        onlyLSDContract("lsdTokenLSETH", msg.sender)
-    {
+    function subVirtualETHBalance(
+        uint256 _amount
+    ) public override onlyLSDContract("lsdTokenLSETH", msg.sender) {
         updateVirtualETHBalance();
 
         uint256 virtualETHBalance = getVirtualETHBalance();
@@ -65,7 +63,7 @@ contract LSDUpdateBalance is LSDBase, ILSDUpdateBalance {
                 virtualETHBalance +
                     (virtualETHBalance * dayPassed * apy) /
                     365 /
-                    (10**apyUnit)
+                    (10 ** apyUnit)
             );
         }
     }
@@ -107,15 +105,19 @@ contract LSDUpdateBalance is LSDBase, ILSDUpdateBalance {
         return lsdRPVault.getETHBalance();
     }
 
-    // Total ETH balance in RP
+    // Total ETH balance in LIDO
     function getTotalETHInLIDO() public view override returns (uint256) {
-        ILSDRPVault lsdRPVault = ILSDRPVault(getContractAddress("lsdRPVault"));
-        return lsdRPVault.getETHBalance();
+        ILSDLIDOVault lsdLIDOVault = ILSDLIDOVault(
+            getContractAddress("lsdLIDOVault")
+        );
+        return lsdLIDOVault.getETHBalance();
     }
 
-    // Total ETH balance in RP
+    // Total ETH balance in SWISE
     function getTotalETHInSWISE() public view override returns (uint256) {
-        ILSDRPVault lsdRPVault = ILSDRPVault(getContractAddress("lsdRPVault"));
-        return lsdRPVault.getETHBalance();
+        ILSDSWISEVault lsdSWISEVault = ILSDSWISEVault(
+            getContractAddress("lsdSWISEVault")
+        );
+        return lsdSWISEVault.getETHBalance();
     }
 }

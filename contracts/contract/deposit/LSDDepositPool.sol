@@ -104,7 +104,7 @@ contract LSDDepositPool is LSDBase, ILSDDepositPool, ILSDVaultWithdrawer {
     }
 
     // Get total withdrawal balance from the vault
-    function getTotalCollateral() external view override returns (uint256) {
+    function getTotalCollateral() external override view returns (uint256) {
         uint256 currentProvider = getCurrentProvider();
         ILSDUpdateBalance lsdUpdateBalance = ILSDUpdateBalance(
             getContractAddress("lsdUpdateBalance")

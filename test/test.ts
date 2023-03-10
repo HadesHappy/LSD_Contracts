@@ -62,6 +62,13 @@ describe("LSD", function () {
       console.log('lido key: ', ethers.utils.keccak256(ethers.utils.solidityPack(['string', 'string'], ["contract.address", "lido"])));
       console.log('uniswapRouter key: ', ethers.utils.keccak256(ethers.utils.solidityPack(['string', 'string'], ["contract.address", "uniswapRouter"])));
       console.log('weth key: ', ethers.utils.keccak256(ethers.utils.solidityPack(['string', 'string'], ["contract.address", "weth"])));
+      console.log('rp key: ', ethers.utils.keccak256(ethers.utils.solidityPack(['string', 'string'], ["contract.address", "rocketDepositPool"])));
+      console.log('rpETH key: ', ethers.utils.keccak256(ethers.utils.solidityPack(['string', 'string'], ["contract.address", "rocketTokenRETH"])));
+      console.log('lsd deposit pool key: ', ethers.utils.keccak256(ethers.utils.solidityPack(['string', 'string'], ["contract.address", "lsdDepositPool"])));
+      console.log('lsd LIDO Vault key: ', ethers.utils.keccak256(ethers.utils.solidityPack(['string', 'string'], ["contract.address", "lsdLIDOVault"])));
+      console.log('lsd update balance key: ', ethers.utils.keccak256(ethers.utils.solidityPack(['string', 'string'], ["contract.address", "lsdUpdateBalance"])));
+      console.log('lsd owner key: ', ethers.utils.keccak256(ethers.utils.solidityPack(['string', 'string'], ["contract.address", "lsdOwner"])));
+      console.log('lsd VELSD key: ', ethers.utils.keccak256(ethers.utils.solidityPack(['string', 'string'], ["contract.address", "lsdTokenVELSD"])));
       // const { lsdStorage, owner, otherAccount } = await loadFixture(deployLSDContracts);
       // console.log('depolyed address: ', lsdStorage.address);
       // console.log('guardian address: ', await lsdStorage.getGuardian());

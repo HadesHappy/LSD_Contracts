@@ -10,5 +10,5 @@ interface ILSDSWISEVault {
 
     function balanceOfrETH2() external returns (uint256);
 
-    function getETHBalance() external returns (uint256);
+    function getETHBalance() external view returns (uint256);
 }
