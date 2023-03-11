@@ -5,9 +5,12 @@ import "../LSDBase.sol";
 import "../../interface/deposit/ILSDDepositPool.sol";
 import "../../interface/owner/ILSDOwner.sol";
 import "../../interface/token/ILSDTokenLSETH.sol";
+import "../../interface/token/ILSDTokenVELSD.sol";
+
 import "../../interface/vault/ILSDLIDOVault.sol";
 import "../../interface/vault/ILSDRPVault.sol";
 import "../../interface/vault/ILSDSWISEVault.sol";
+
 import "../../interface/ILSDVaultWithdrawer.sol";
 import "../../interface/balance/ILSDUpdateBalance.sol";
 
@@ -40,11 +43,7 @@ contract LSDDepositPool is LSDBase, ILSDDepositPool, ILSDVaultWithdrawer {
 
     // Receive a vault withdrawal
     // Only accepts calls from the Vault contract
-    function receiveVaultWithdrawalETH()
-        external
-        payable
-        override
-    {}
+    function receiveVaultWithdrawalETH() external payable override {}
 
     // Get current provider
     function getCurrentProvider() public view override returns (uint256) {
@@ -74,7 +73,7 @@ contract LSDDepositPool is LSDBase, ILSDDepositPool, ILSDVaultWithdrawer {
         ILSDTokenLSETH lsdTokenLsETH = ILSDTokenLSETH(
             getContractAddress("lsdTokenLSETH")
         );
-        lsdTokenLsETH.mint(msg.value, msg.sender);
+        lsdTokenLsETH.mint(getMulipliedAmount(msg.value), msg.sender);
         // Emit deposit received event
         emit DepositReceived(msg.sender, msg.value, block.timestamp);
         // Get the current provider
@@ -103,27 +102,10 @@ contract LSDDepositPool is LSDBase, ILSDDepositPool, ILSDVaultWithdrawer {
         }
     }
 
-    // Get total withdrawal balance from the vault
-    function getTotalCollateral() external override view returns (uint256) {
-        uint256 currentProvider = getCurrentProvider();
-        ILSDUpdateBalance lsdUpdateBalance = ILSDUpdateBalance(
-            getContractAddress("lsdUpdateBalance")
-        );
-        if (currentProvider == 0) {
-            return lsdUpdateBalance.getTotalETHInRP();
-        } else if (currentProvider == 1) {
-            return lsdUpdateBalance.getTotalETHInLIDO();
-        } else {
-            return lsdUpdateBalance.getTotalETHInSWISE();
-        }
-    }
-
     // Withdraw Ether from the vault
-    function withdrawEther(uint256 _amount)
-        public
-        override
-        onlyLSDContract("lsdTokenLSETH", msg.sender)
-    {
+    function withdrawEther(
+        uint256 _amount
+    ) public override onlyLSDContract("lsdTokenLSETH", msg.sender) {
         uint256 currentProvider = getCurrentProvider();
         if (currentProvider == 0) {
             ILSDRPVault lsdRPVault = ILSDRPVault(
@@ -141,6 +123,34 @@ contract LSDDepositPool is LSDBase, ILSDDepositPool, ILSDVaultWithdrawer {
             );
             lsdSWISEVault.withdrawEther(_amount);
         }
-        payable(msg.sender).transfer(address(this).balance);     
+        payable(msg.sender).transfer(address(this).balance);
+    }
+
+    // Get Multiplied amount
+    function getMulipliedAmount(
+        uint256 _amount
+    ) private view returns (uint256) {
+        if (getContractAddress("lsdTokenVELSD") == address(0)) return _amount;
+        ILSDTokenVELSD lsdTokenVELSD = ILSDTokenVELSD(
+            getContractAddress("lsdTokenVELSD")
+        );
+
+        uint256 veLSDBalance = lsdTokenVELSD.balanceOf(msg.sender);
+        if (veLSDBalance == 0) {
+            return _amount;
+        }
+
+        // Get Multiplier
+        ILSDOwner lsdOwner = ILSDOwner(getContractAddress("lsdOwner"));
+        uint256 multiplier = lsdOwner.getMultiplier();
+        uint256 multiplierUnit = lsdOwner.getMultiplierUnit();
+
+        if (multiplier == 0 || multiplierUnit == 0) {
+            return _amount;
+        }
+        return
+            _amount +
+            (_amount * veLSDBalance * multiplier) /
+            (10 ** (multiplierUnit + 36));
     }
 }

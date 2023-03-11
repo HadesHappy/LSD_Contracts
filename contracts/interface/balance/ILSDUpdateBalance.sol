@@ -19,10 +19,4 @@ interface ILSDUpdateBalance {
 
     function getTotalVELSDSupply() external view returns (uint256);
 
-    // Rocket Pool Staking ETH Balance
-    function getTotalETHInRP() external view returns (uint256);
-
-    function getTotalETHInLIDO() external view returns (uint256);
-
-    function getTotalETHInSWISE() external view returns (uint256);
 }

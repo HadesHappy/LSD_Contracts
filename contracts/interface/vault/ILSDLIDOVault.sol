@@ -6,7 +6,7 @@ interface ILSDLIDOVault {
 
     function withdrawEther(uint256 _ethAmount) external;
 
-    function getETHBalance() external view returns (uint256);
+    function getStETHBalance() external view returns (uint256);
 
     function getSharesOfStETH(uint256 _ethAmount) external returns (uint256);
 }

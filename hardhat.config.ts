@@ -32,7 +32,7 @@ module.exports = {
       accounts: [process.env.PRIVATEKEY]
     },
     ethereum: {
-      url: "https://main-light.eth.linkpool.io/",
+      url: "https://ethereum.blockpi.network/v1/rpc/public",
       accounts: [process.env.PRIVATEKEY]
     },
     bsc: {

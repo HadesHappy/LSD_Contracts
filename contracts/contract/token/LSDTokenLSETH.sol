@@ -93,27 +93,6 @@ contract LSDTokenLSETH is LSDBase, ERC20, ILSDTokenLSETH {
         return (_ethAmount * lsethSupply) / virtualETHBalance;
     }
 
-    // Get Multiplied amount
-    function getMulipliedAmount(uint256 _amount)
-        private
-        view
-        returns (uint256)
-    {
-        ILSDTokenVELSD lsdTokenVELSD = ILSDTokenVELSD(
-            getContractAddress("lsdTokenVELSD")
-        );
-        uint256 veLSDBalance = lsdTokenVELSD.balanceOf(msg.sender);
-        if (veLSDBalance == 0) {
-            return _amount;
-        }
-
-        // Get Multiplier
-        ILSDOwner lsdOwner = ILSDOwner(getContractAddress("lsdOwner"));
-        uint256 multiplier = lsdOwner.getMultiplier();
-        uint256 multiplierUnit = lsdOwner.getMultiplierUnit();
-        return _amount + (_amount * multiplier) / multiplierUnit;
-    }
-
     // Get the current ETH : lsETH exchange rate
     // Return the amount of ETH backing 1 lsETH
     function getExchangeRate() external view override returns (uint256) {
@@ -152,22 +131,19 @@ contract LSDTokenLSETH is LSDBase, ERC20, ILSDTokenLSETH {
         );
 
         // Get ETH amount
-        uint256 ethAmount = getMulipliedAmount(getEthValue(_lsethAmount));
+        uint256 ethAmount = getEthValue(_lsethAmount);
         // Get & Check ETH balance
         ILSDDepositPool lsdDepositPool = ILSDDepositPool(
             getContractAddress("lsdDepositPool")
         );
-        uint256 ethBalance = lsdDepositPool.getTotalCollateral();
-        require(
-            ethBalance >= ethAmount,
-            "Insufficient ETH balance for exchange"
-        );
+
         // Update balance & supply
         _burn(msg.sender, _lsethAmount);
         // Withdraw ETH from deposit pool if required
         lsdDepositPool.withdrawEther(ethAmount);
         // Transfer ETH to sender
         payable(msg.sender).transfer(address(this).balance);
+        
         ILSDUpdateBalance lsdUpdateBalance = ILSDUpdateBalance(
             getContractAddress("lsdUpdateBalance")
         );

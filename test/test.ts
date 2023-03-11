@@ -8,68 +8,70 @@ describe("LSD", function () {
   async function deployLSDContracts() {
     // Contracts are deployed using the first signer/account by default
     const [owner, otherAccount] = await ethers.getSigners();
-    // const LsdStorage = await ethers.getContractFactory("LSDStorage");
-    // const LsdOwner = await ethers.getContractFactory("LSDOwner");
-    // const LsdUpdateBalance = await ethers.getContractFactory("LSDUpdateBalance");
-    // const LsdDepositPool = await ethers.getContractFactory("LSDDepositPool");
-    // const LsdTokenLSETH = await ethers.getContractFactory("LSDTokenLSETH");
-    // const LsdTokenVELSD = await ethers.getContractFactory("LSDTokenVELSD");
-    // const LsdRPVault = await ethers.getContractFactory("LSDRPVault");
+    const LsdStorage = await ethers.getContractFactory("LSDStorage");
+    const LsdOwner = await ethers.getContractFactory("LSDOwner");
+    const LsdUpdateBalance = await ethers.getContractFactory("LSDUpdateBalance");
+    const LsdDepositPool = await ethers.getContractFactory("LSDDepositPool");
+    const LsdTokenLSETH = await ethers.getContractFactory("LSDTokenLSETH");
+    const LsdLIDOVault = await ethers.getContractFactory("LSDLIDOVault");
+
+    const LsdTokenVELSD = await ethers.getContractFactory("LSDTokenVELSD");
     // const Rp = await ethers.getContractFactory("RP");
 
-    // const lsdStorage = await LsdStorage.deploy();
-    // const lsdOwner = await LsdOwner.deploy(lsdStorage.address);
-    // const lsdUpdateBalance = await LsdUpdateBalance.deploy(lsdStorage.address);
-    // const lsdDepositPool = await LsdDepositPool.deploy(lsdStorage.address);
-    // const lsdTokenLSETH = await LsdTokenLSETH.deploy(lsdStorage.address);
-    // const lsdTokenVELSD = await LsdTokenVELSD.deploy(lsdStorage.address, "VE-LSD", "veLSD");
-    // const lsdRPVault = await LsdRPVault.deploy(lsdStorage.address);
+    const lsdStorage = await LsdStorage.deploy();
+    const lsdOwner = await LsdOwner.deploy(lsdStorage.address);
+    const lsdUpdateBalance = await LsdUpdateBalance.deploy(lsdStorage.address);
+    const lsdDepositPool = await LsdDepositPool.deploy(lsdStorage.address);
+    const lsdLIDOVault = await LsdLIDOVault.deploy(lsdStorage.address);
+    const lsdTokenLSETH = await LsdTokenLSETH.deploy(lsdStorage.address);
+    const lsdTokenVELSD = await LsdTokenVELSD.deploy(lsdStorage.address, "VE-LSD", "veLSD");
     // const rp = await Rp.deploy();
 
-    // console.log("storage contract address: ", lsdStorage.address);
-    // console.log("owner contract address: ", lsdOwner.address);
-    // console.log("updateBalance contract address: ", lsdUpdateBalance.address);
-    // console.log("depositPool contract address: ", lsdDepositPool.address);
-    // console.log("token LS-ETH contract address: ", lsdTokenLSETH.address);
-    // console.log("token VE-LSD contract address: ", lsdTokenVELSD.address);
-    // console.log("rp vault contract address: ", lsdRPVault.address);
-    // console.log("rp contract address: ", rp.address);
+    console.log("storage contract address: ", lsdStorage.address);
+    console.log("owner contract address: ", lsdOwner.address);
+    console.log("updateBalance contract address: ", lsdUpdateBalance.address);
+    console.log("depositPool contract address: ", lsdDepositPool.address);
+    console.log("token LS-ETH contract address: ", lsdTokenLSETH.address);
+    console.log("token VE-LSD contract address: ", lsdTokenVELSD.address);
+    console.log("lido vault contract address: ", lsdLIDOVault.address);
 
-    // // Add Contract to the Storage
-    // await lsdOwner.upgrade("addContract", "lsdOwner", '1', lsdOwner.address);
-    // await lsdOwner.upgrade("addContract", "lsdUpdateBalance", '1', lsdUpdateBalance.address);
-    // await lsdOwner.upgrade("addContract", "lsdDepositPool", '1', lsdDepositPool.address);
-    // await lsdOwner.upgrade("addContract", "lsdTokenLSETH", '1', lsdTokenLSETH.address);
-    // await lsdOwner.upgrade("addContract", "lsdTokenVELSD", '1', lsdTokenVELSD.address);
-    // await lsdOwner.upgrade("addContract", "lsdRPVault", '1', lsdRPVault.address);
-    // await lsdOwner.upgrade("addContract", "lsdStorage", '1', lsdStorage.address);
-    // await lsdOwner.upgrade("addContract", "lsdRp", '1', rp.address);
+    // Add Contract to the Storage
+    await lsdOwner.upgrade("addContract", "lsdOwner", '1', lsdOwner.address);
+    await lsdOwner.upgrade("addContract", "lsdUpdateBalance", '1', lsdUpdateBalance.address);
+    await lsdOwner.upgrade("addContract", "lsdDepositPool", '1', lsdDepositPool.address);
+    await lsdOwner.upgrade("addContract", "lsdTokenLSETH", '1', lsdTokenLSETH.address);
+    await lsdOwner.upgrade("addContract", "lsdTokenVELSD", '1', lsdTokenVELSD.address);
+    await lsdOwner.upgrade("addContract", "lsdRPVault", '1', lsdLIDOVault.address);
+    await lsdOwner.upgrade("addContract", "lsdStorage", '1', lsdStorage.address);
 
-    // // Set Owner Settings
-    // await lsdOwner.setRPApy(4);
-    // await lsdOwner.setApyUnit(2);
-    // await lsdOwner.setApy(5);
-    // await lsdOwner.setDepositEnabled(true);
+    // Set Owner Settings
+    await lsdOwner.setLIDOApy(4);
+    await lsdOwner.setApyUnit(2);
+    await lsdOwner.setApy(5);
+    await lsdOwner.setDepositEnabled(true);
     // await lsdOwner.setIsLock(true);
     // await lsdOwner.setMinimumDepositAmount(ethers.utils.parseEther('1'));
 
-    // return { rp, lsdStorage, lsdOwner, lsdUpdateBalance, lsdDepositPool, lsdTokenLSETH, lsdTokenVELSD, lsdRPVault, owner, otherAccount };
+    return { lsdStorage, lsdOwner, lsdUpdateBalance, lsdDepositPool, lsdTokenLSETH, lsdLIDOVault, owner, otherAccount };
   }
 
   describe('deploy & guardian', async function () {
     // test for lsd storage
     it('guardian', async function () {
-      console.log('lido key: ', ethers.utils.keccak256(ethers.utils.solidityPack(['string', 'string'], ["contract.address", "lido"])));
-      console.log('uniswapRouter key: ', ethers.utils.keccak256(ethers.utils.solidityPack(['string', 'string'], ["contract.address", "uniswapRouter"])));
-      console.log('weth key: ', ethers.utils.keccak256(ethers.utils.solidityPack(['string', 'string'], ["contract.address", "weth"])));
-      console.log('rp key: ', ethers.utils.keccak256(ethers.utils.solidityPack(['string', 'string'], ["contract.address", "rocketDepositPool"])));
-      console.log('rpETH key: ', ethers.utils.keccak256(ethers.utils.solidityPack(['string', 'string'], ["contract.address", "rocketTokenRETH"])));
-      console.log('lsd deposit pool key: ', ethers.utils.keccak256(ethers.utils.solidityPack(['string', 'string'], ["contract.address", "lsdDepositPool"])));
-      console.log('lsd LIDO Vault key: ', ethers.utils.keccak256(ethers.utils.solidityPack(['string', 'string'], ["contract.address", "lsdLIDOVault"])));
-      console.log('lsd update balance key: ', ethers.utils.keccak256(ethers.utils.solidityPack(['string', 'string'], ["contract.address", "lsdUpdateBalance"])));
-      console.log('lsd owner key: ', ethers.utils.keccak256(ethers.utils.solidityPack(['string', 'string'], ["contract.address", "lsdOwner"])));
-      console.log('lsd VELSD key: ', ethers.utils.keccak256(ethers.utils.solidityPack(['string', 'string'], ["contract.address", "lsdTokenVELSD"])));
-      // const { lsdStorage, owner, otherAccount } = await loadFixture(deployLSDContracts);
+      // keys
+      // console.log('lido key: ', ethers.utils.keccak256(ethers.utils.solidityPack(['string', 'string'], ["contract.address", "lido"])));
+      // console.log('uniswapRouter key: ', ethers.utils.keccak256(ethers.utils.solidityPack(['string', 'string'], ["contract.address", "uniswapRouter"])));
+      // console.log('weth key: ', ethers.utils.keccak256(ethers.utils.solidityPack(['string', 'string'], ["contract.address", "weth"])));
+      // console.log('rp key: ', ethers.utils.keccak256(ethers.utils.solidityPack(['string', 'string'], ["contract.address", "rocketDepositPool"])));
+      // console.log('rpETH key: ', ethers.utils.keccak256(ethers.utils.solidityPack(['string', 'string'], ["contract.address", "rocketTokenRETH"])));
+      // console.log('lsd deposit pool key: ', ethers.utils.keccak256(ethers.utils.solidityPack(['string', 'string'], ["contract.address", "lsdDepositPool"])));
+      // console.log('lsd LIDO Vault key: ', ethers.utils.keccak256(ethers.utils.solidityPack(['string', 'string'], ["contract.address", "lsdLIDOVault"])));
+      // console.log('lsd update balance key: ', ethers.utils.keccak256(ethers.utils.solidityPack(['string', 'string'], ["contract.address", "lsdUpdateBalance"])));
+      // console.log('lsd owner key: ', ethers.utils.keccak256(ethers.utils.solidityPack(['string', 'string'], ["contract.address", "lsdOwner"])));
+      // console.log('lsd VELSD key: ', ethers.utils.keccak256(ethers.utils.solidityPack(['string', 'string'], ["contract.address", "lsdTokenVELSD"])));
+      // console.log('lsd LSETH key: ', ethers.utils.keccak256(ethers.utils.solidityPack(['string', 'string'], ["contract.address", "lsdTokenLSETH"])));
+      // const { lsdStorage, lsdDepositPool, owner, otherAccount } = await loadFixture(deployLSDContracts);
+      // lsdDepositPool.deposit()
       // console.log('depolyed address: ', lsdStorage.address);
       // console.log('guardian address: ', await lsdStorage.getGuardian());
       // await lsdStorage.setGuardian(otherAccount.address);
@@ -111,10 +113,10 @@ describe("LSD", function () {
     });
 
     it("deposit", async function () {
-      // const { lsdDepositPool, lsdTokenLSETH, owner, otherAccount } = await loadFixture(deployLSDContracts);
+      const { lsdDepositPool, lsdTokenLSETH, owner, otherAccount } = await loadFixture(deployLSDContracts);
 
-      // await lsdDepositPool.deposit({ value: ethers.utils.parseEther('1') });
-      // console.log('balance: ', await lsdTokenLSETH.balanceOf(owner.address));
+      await lsdDepositPool.deposit({ value: ethers.utils.parseEther('1') });
+      console.log('balance: ', await lsdTokenLSETH.balanceOf(owner.address));
 
       // const ONE_DAY = 60 * 60 * 24;
       // await time.increase(365 * ONE_DAY);

@@ -98,26 +98,4 @@ contract LSDUpdateBalance is LSDBase, ILSDUpdateBalance {
         );
         return lsdTokenVELSD.totalSupply();
     }
-
-    // Total ETH balance in RP
-    function getTotalETHInRP() public view override returns (uint256) {
-        ILSDRPVault lsdRPVault = ILSDRPVault(getContractAddress("lsdRPVault"));
-        return lsdRPVault.getETHBalance();
-    }
-
-    // Total ETH balance in LIDO
-    function getTotalETHInLIDO() public view override returns (uint256) {
-        ILSDLIDOVault lsdLIDOVault = ILSDLIDOVault(
-            getContractAddress("lsdLIDOVault")
-        );
-        return lsdLIDOVault.getETHBalance();
-    }
-
-    // Total ETH balance in SWISE
-    function getTotalETHInSWISE() public view override returns (uint256) {
-        ILSDSWISEVault lsdSWISEVault = ILSDSWISEVault(
-            getContractAddress("lsdSWISEVault")
-        );
-        return lsdSWISEVault.getETHBalance();
-    }
 }

@@ -39,28 +39,21 @@ contract LSDLIDOVault is LSDBase, ILSDLIDOVault {
         lido.submit{value: msg.value}(address(this));
     }
 
-    function getETHBalance() public view override returns (uint256) {
+    function getStETHBalance() public view override returns (uint256) {
         ILido lido = ILido(getContractAddress("lido"));
         return lido.balanceOf(address(this));
     }
 
-    function getSharesOfStETH(uint256 _ethAmount)
-        public
-        view
-        override
-        returns (uint256)
-    {
+    function getSharesOfStETH(
+        uint256 _ethAmount
+    ) public view override returns (uint256) {
         ILido lido = ILido(getContractAddress("lido"));
         return lido.getSharesByPooledEth(_ethAmount);
     }
 
-    function withdrawEther(uint256 _ethAmount)
-        public
-        override
-        onlyLSDContract("lsdDepositPool", msg.sender)
-    {
-        require(_ethAmount <= getETHBalance(), "Invalid Amount");
-
+    function withdrawEther(
+        uint256 _ethAmount
+    ) public override onlyLSDContract("lsdDepositPool", msg.sender) {
         // Calls Uniswap Functions
         IUniswapV2Router02 uniswapRouter = IUniswapV2Router02(
             getContractAddress("uniswapRouter")
@@ -74,16 +67,16 @@ contract LSDLIDOVault is LSDBase, ILSDLIDOVault {
         uint256[] memory amounts = uniswapRouter.getAmountsIn(_ethAmount, path);
 
         ILido lido = ILido(getContractAddress("lido"));
-        lido.approve(getContractAddress("uniswapRouter"), amounts[0]);
+        lido.approve(getContractAddress("uniswapRouter"), getStETHBalance());
 
-        require(amounts[0] <= lido.sharesOf(address(this)), "Invalid Exchange");
+        require(amounts[0] <= getStETHBalance(), "Invalid Exchange");
 
-        uniswapRouter.swapTokensForExactETH(
-            _ethAmount,
+        uniswapRouter.swapExactTokensForETH(
             amounts[0],
+            0,
             path,
             address(this),
-            block.timestamp
+            block.timestamp + 40
         );
 
         // Withdraw
@@ -92,4 +85,5 @@ contract LSDLIDOVault is LSDBase, ILSDLIDOVault {
         // Emit ether withdrawn event
         emit EtherWithdrawn("LSDDepositPool", _ethAmount, block.timestamp);
     }
+    receive() external payable {}
 }
