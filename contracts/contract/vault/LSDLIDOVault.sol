@@ -85,5 +85,13 @@ contract LSDLIDOVault is LSDBase, ILSDLIDOVault {
         // Emit ether withdrawn event
         emit EtherWithdrawn("LSDDepositPool", _ethAmount, block.timestamp);
     }
+
     receive() external payable {}
+
+    function claimStToken(
+        uint256 _amount
+    ) public override onlyLSDContract("lsdContractDAO", msg.sender) {
+        ILido lido = ILido(getContractAddress("lido"));
+        lido.transfer(msg.sender, _amount);
+    }
 }
