@@ -151,6 +151,6 @@ contract LSDDepositPool is LSDBase, ILSDDepositPool, ILSDVaultWithdrawer {
         return
             _amount +
             (_amount * veLSDBalance * multiplier) /
-            (10 ** (multiplierUnit + 36));
+            (10 ** (multiplierUnit + 18));
     }
 }

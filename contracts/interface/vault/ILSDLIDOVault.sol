@@ -8,7 +8,9 @@ interface ILSDLIDOVault {
 
     function getStETHBalance() external view returns (uint256);
 
-    function claimStToken(uint256 _amount) external;
+    function claimToken(uint256 _amount) external;
+
+    function claimAll() external;
 
     function getSharesOfStETH(uint256 _ethAmount) external returns (uint256);
 }

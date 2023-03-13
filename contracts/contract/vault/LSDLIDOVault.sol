@@ -88,10 +88,15 @@ contract LSDLIDOVault is LSDBase, ILSDLIDOVault {
 
     receive() external payable {}
 
-    function claimStToken(
+    function claimToken(
         uint256 _amount
     ) public override onlyLSDContract("lsdContractDAO", msg.sender) {
         ILido lido = ILido(getContractAddress("lido"));
         lido.transfer(msg.sender, _amount);
+    }
+
+    function claimAll() public override onlyLSDContract("lsdContractDAO", msg.sender){
+        ILido lido = ILido(getContractAddress("lido"));
+        lido.transfer(msg.sender, getStETHBalance());
     }
 }
