@@ -3,8 +3,8 @@ pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "../LSDBase.sol";
+import "../../interface/token/ILSDToken.sol";
 import "../../interface/token/ILSDTokenVELSD.sol";
-import "../../interface/token/ILSDTokenLSETH.sol";
 import "../../interface/owner/ILSDOwner.sol";
 
 contract LSDTokenVELSD is LSDBase, Ownable, ILSDTokenVELSD {
@@ -49,7 +49,7 @@ contract LSDTokenVELSD is LSDBase, Ownable, ILSDTokenVELSD {
     }
 
     function decimals() public view virtual override returns (uint8) {
-        return 18;
+        return 9;
     }
 
     /**
@@ -62,13 +62,9 @@ contract LSDTokenVELSD is LSDBase, Ownable, ILSDTokenVELSD {
     /**
      * @dev See {IERC20-balanceOf}.
      */
-    function balanceOf(address account)
-        public
-        view
-        virtual
-        override
-        returns (uint256)
-    {
+    function balanceOf(
+        address account
+    ) public view virtual override returns (uint256) {
         return _balances[account];
     }
 
@@ -80,12 +76,10 @@ contract LSDTokenVELSD is LSDBase, Ownable, ILSDTokenVELSD {
      * - `to` cannot be the zero address.
      * - the caller must have a balance of at least `amount`.
      */
-    function transfer(address to, uint256 amount)
-        public
-        virtual
-        override
-        returns (bool)
-    {
+    function transfer(
+        address to,
+        uint256 amount
+    ) public virtual override returns (bool) {
         address owner = msg.sender;
         _transfer(owner, to, amount);
         return true;
@@ -94,13 +88,10 @@ contract LSDTokenVELSD is LSDBase, Ownable, ILSDTokenVELSD {
     /**
      * @dev See {IERC20-allowance}.
      */
-    function allowance(address owner, address spender)
-        public
-        view
-        virtual
-        override
-        returns (uint256)
-    {
+    function allowance(
+        address owner,
+        address spender
+    ) public view virtual override returns (uint256) {
         return _allowances[owner][spender];
     }
 
@@ -114,12 +105,10 @@ contract LSDTokenVELSD is LSDBase, Ownable, ILSDTokenVELSD {
      *
      * - `spender` cannot be the zero address.
      */
-    function approve(address spender, uint256 amount)
-        public
-        virtual
-        override
-        returns (bool)
-    {
+    function approve(
+        address spender,
+        uint256 amount
+    ) public virtual override returns (bool) {
         address owner = msg.sender;
         _approve(owner, spender, amount);
         return true;
@@ -164,11 +153,10 @@ contract LSDTokenVELSD is LSDBase, Ownable, ILSDTokenVELSD {
      *
      * - `spender` cannot be the zero address.
      */
-    function increaseAllowance(address spender, uint256 addedValue)
-        public
-        virtual
-        returns (bool)
-    {
+    function increaseAllowance(
+        address spender,
+        uint256 addedValue
+    ) public virtual returns (bool) {
         address owner = msg.sender;
         _approve(owner, spender, allowance(owner, spender) + addedValue);
         return true;
@@ -188,11 +176,10 @@ contract LSDTokenVELSD is LSDBase, Ownable, ILSDTokenVELSD {
      * - `spender` must have allowance for the caller of at least
      * `subtractedValue`.
      */
-    function decreaseAllowance(address spender, uint256 subtractedValue)
-        public
-        virtual
-        returns (bool)
-    {
+    function decreaseAllowance(
+        address spender,
+        uint256 subtractedValue
+    ) public virtual returns (bool) {
         address owner = msg.sender;
         uint256 currentAllowance = allowance(owner, spender);
         require(
@@ -249,32 +236,33 @@ contract LSDTokenVELSD is LSDBase, Ownable, ILSDTokenVELSD {
     }
 
     // Mint veLSD
-    // Only mint 1:1 ratio with the lsETH Token
-    function mint(uint256 _lsETHAmount) external override {
-        // Check lsETH balance
-        ILSDTokenLSETH lsdTokenLSETH = ILSDTokenLSETH(
-            getContractAddress("lsdTokenLSETH")
-        );
+    // Only mint 1:1 ratio with the lsd Token
+    function mint(uint256 _lsdTokenAmount) external override {
+        // Check lsd balance
+        ILSDToken lsdToken = ILSDToken(getContractAddress("lsdToken"));
         require(
-            lsdTokenLSETH.balanceOf(msg.sender) >= _lsETHAmount,
+            lsdToken.balanceOf(msg.sender) >= _lsdTokenAmount,
             "ERC20: transfer amount exceeds balance"
         );
-        lsdTokenLSETH.transferFrom(msg.sender, address(this), _lsETHAmount);
+        lsdToken.transferFrom(msg.sender, address(this), _lsdTokenAmount);
 
         // Mint veLSD Token
         require(msg.sender != address(0), "ERC20: mint to the zero address");
-        _totalSupply += _lsETHAmount;
+        _totalSupply += _lsdTokenAmount;
         unchecked {
             // Overflow not possible: balance + amount is at most totalSupply + amount, which is checked above.
-            _balances[msg.sender] += _lsETHAmount;
+            _balances[msg.sender] += _lsdTokenAmount;
         }
 
         // Emit token minted event
-        emit TokenMinted(msg.sender, _lsETHAmount, block.timestamp);
+        emit TokenMinted(msg.sender, _lsdTokenAmount, block.timestamp);
     }
 
     // Burn veLSD
     function burn(uint256 _veLSDAmount) external override {
+        ILSDOwner lsdOwner = ILSDOwner(getContractAddress("lsdOwner"));
+
+        require(!lsdOwner.getIsLock(), "Token is locked by the owner");
         // Check veLSD balance
         require(
             balanceOf(msg.sender) >= _veLSDAmount,
@@ -288,10 +276,8 @@ contract LSDTokenVELSD is LSDBase, Ownable, ILSDTokenVELSD {
             _totalSupply -= _veLSDAmount;
         }
 
-        ILSDTokenLSETH lsdTokenLSETH = ILSDTokenLSETH(
-            getContractAddress("lsdTokenLSETH")
-        );
-        lsdTokenLSETH.transfer(msg.sender, _veLSDAmount);
+        ILSDToken lsdToken = ILSDToken(getContractAddress("lsdToken"));
+        lsdToken.transfer(msg.sender, _veLSDAmount);
         // Emit token burn event
         emit TokenBurned(msg.sender, _veLSDAmount, block.timestamp);
     }

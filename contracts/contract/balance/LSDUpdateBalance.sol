@@ -98,4 +98,5 @@ contract LSDUpdateBalance is LSDBase, ILSDUpdateBalance {
         );
         return lsdTokenVELSD.totalSupply();
     }
+
 }
