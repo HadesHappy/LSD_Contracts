@@ -133,10 +133,4 @@ contract LSDStakingPool is LSDBase, ILSDStakingPool {
     function getTotalRewards() public view override returns (uint256) {
         return totalRewards;
     }
-
-    // return user
-    function getUser(address _address) public view returns (User memory) {
-        User memory user = users[_address];
-        return user;
-    }
 }
