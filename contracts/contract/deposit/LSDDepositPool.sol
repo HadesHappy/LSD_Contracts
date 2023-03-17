@@ -2,6 +2,7 @@
 pragma solidity ^0.8.9;
 
 import "../LSDBase.sol";
+
 import "../../interface/deposit/ILSDDepositPool.sol";
 import "../../interface/owner/ILSDOwner.sol";
 import "../../interface/token/ILSDTokenLSETH.sol";
@@ -11,13 +12,12 @@ import "../../interface/vault/ILSDLIDOVault.sol";
 import "../../interface/vault/ILSDRPVault.sol";
 import "../../interface/vault/ILSDSWISEVault.sol";
 
-import "../../interface/ILSDVaultWithdrawer.sol";
 import "../../interface/balance/ILSDUpdateBalance.sol";
 
 // The main entry point for deposits into the LSD network.
 // Accepts user deposits and mints lsETH; handles assignment of deposited ETH to various providers
 
-contract LSDDepositPool is LSDBase, ILSDDepositPool, ILSDVaultWithdrawer {
+contract LSDDepositPool is LSDBase, ILSDDepositPool {
     // Events
     event DepositReceived(address indexed from, uint256 amount, uint256 time);
 
@@ -41,10 +41,6 @@ contract LSDDepositPool is LSDBase, ILSDDepositPool, ILSDVaultWithdrawer {
         version = 1;
     }
 
-    // Receive a vault withdrawal
-    // Only accepts calls from the Vault contract
-    function receiveVaultWithdrawalETH() external payable override {}
-
     // Get current provider
     function getCurrentProvider() public view override returns (uint256) {
         ILSDOwner lsdOwner = ILSDOwner(getContractAddress("lsdOwner"));
@@ -61,10 +57,6 @@ contract LSDDepositPool is LSDBase, ILSDDepositPool, ILSDVaultWithdrawer {
     function deposit() external payable override onlyThisContract {
         // Check deposit Settings
         ILSDOwner lsdOwner = ILSDOwner(getContractAddress("lsdOwner"));
-        require(
-            lsdOwner.getDepositEnabled(),
-            "Deposit into LSD are currently disabled."
-        );
         require(
             msg.value >= lsdOwner.getMinimumDepositAmount(),
             "The deposited amount is less than the minimum deposit size"
@@ -104,7 +96,8 @@ contract LSDDepositPool is LSDBase, ILSDDepositPool, ILSDVaultWithdrawer {
 
     // Withdraw Ether from the vault
     function withdrawEther(
-        uint256 _amount
+        uint256 _amount,
+        address _address
     ) public override onlyLSDContract("lsdTokenLSETH", msg.sender) {
         uint256 currentProvider = getCurrentProvider();
         if (currentProvider == 0) {
@@ -116,14 +109,13 @@ contract LSDDepositPool is LSDBase, ILSDDepositPool, ILSDVaultWithdrawer {
             ILSDLIDOVault lsdLIDOVault = ILSDLIDOVault(
                 getContractAddress("lsdLIDOVault")
             );
-            lsdLIDOVault.withdrawEther(_amount);
+            lsdLIDOVault.withdrawEther(_amount, _address);
         } else {
             ILSDSWISEVault lsdSWISEVault = ILSDSWISEVault(
                 getContractAddress("lsdSWISEVault")
             );
             lsdSWISEVault.withdrawEther(_amount);
         }
-        payable(msg.sender).transfer(address(this).balance);
     }
 
     // Get Multiplied amount
@@ -143,14 +135,11 @@ contract LSDDepositPool is LSDBase, ILSDDepositPool, ILSDVaultWithdrawer {
         // Get Multiplier
         ILSDOwner lsdOwner = ILSDOwner(getContractAddress("lsdOwner"));
         uint256 multiplier = lsdOwner.getMultiplier();
-        uint256 multiplierUnit = lsdOwner.getMultiplierUnit();
 
-        if (multiplier == 0 || multiplierUnit == 0) {
+        if (multiplier == 0) {
             return _amount;
         }
         return
-            _amount +
-            (_amount * veLSDBalance * multiplier) /
-            (10 ** (multiplierUnit + 18));
+            _amount * (1 + (veLSDBalance * multiplier) / (10 ** 19));
     }
 }

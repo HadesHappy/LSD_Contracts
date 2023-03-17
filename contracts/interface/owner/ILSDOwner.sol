@@ -2,17 +2,11 @@
 pragma solidity ^0.8.9;
 
 interface ILSDOwner {
-    function getDepositEnabled() external view returns (bool);
-
-    function getIsLock() external view returns (bool);
-
     function getApy() external view returns (uint256);
 
+    function getStakeApr() external view returns (uint256);
+
     function getMultiplier() external view returns (uint256);
-
-    function getMultiplierUnit() external view returns (uint256);
-
-    function getApyUnit() external view returns (uint256);
 
     function getLIDOApy() external view returns (uint256);
 
@@ -24,17 +18,11 @@ interface ILSDOwner {
 
     function getMinimumDepositAmount() external view returns (uint256);
 
-    function setDepositEnabled(bool _depositEnabled) external;
-
-    function setIsLock(bool _isLock) external;
-
     function setApy(uint256 _apy) external;
 
-    function setApyUnit(uint256 _apyUnit) external;
+    function setStakeApr(uint256 _stakeApr) external;
 
     function setMultiplier(uint256 _multiplier) external;
-
-    function setMultiplierUnit(uint256 _multiplierUnit) external;
 
     function setRPApy(uint256 _rpApy) external;
 

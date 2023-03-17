@@ -38,6 +38,12 @@ contract LSDOwner is Ownable, LSDBase, ILSDOwner {
             getUint(keccak256(abi.encodePacked(ownerSettingNameSpace, "apy")));
     }
 
+    // Get the staking annual profit
+    function getStakeApr() public view override returns (uint256) {
+        return
+            getUint(keccak256(abi.encodePacked(ownerSettingNameSpace, "stake.apr")));
+    }
+
     // Get the LIDO Apy
     function getLIDOApy() public view override returns (uint256) {
         return
@@ -62,14 +68,6 @@ contract LSDOwner is Ownable, LSDBase, ILSDOwner {
             );
     }
 
-    // Get the annual profit Unit
-    function getApyUnit() public view override returns (uint256) {
-        return
-            getUint(
-                keccak256(abi.encodePacked(ownerSettingNameSpace, "apy.unit"))
-            );
-    }
-
     // Get the protocol fee
     function getProtocolFee() public view override returns (uint256) {
         return
@@ -88,16 +86,6 @@ contract LSDOwner is Ownable, LSDBase, ILSDOwner {
             );
     }
 
-    // Get the multiplier unit
-    function getMultiplierUnit() public view override returns (uint256) {
-        return
-            getUint(
-                keccak256(
-                    abi.encodePacked(ownerSettingNameSpace, "multiplier.unit")
-                )
-            );
-    }
-
     // Get the minimum deposit amount
     function getMinimumDepositAmount() public view override returns (uint256) {
         return
@@ -111,22 +99,6 @@ contract LSDOwner is Ownable, LSDBase, ILSDOwner {
             );
     }
 
-    // Get the deposit enabled
-    function getDepositEnabled() public view override returns (bool) {
-        return
-            getBool(
-                keccak256(
-                    abi.encodePacked(ownerSettingNameSpace, "deposit.enabled")
-                )
-            );
-    }
-
-    // Get the LSD Token Lock/Unlock
-    function getIsLock() public view override returns (bool) {
-        return
-            getBool(keccak256(abi.encodePacked(ownerSettingNameSpace, "lock")));
-    }
-
     // Set the annual profit
     function setApy(uint256 _apy) public override onlyOwner {
         setUint(
@@ -135,11 +107,11 @@ contract LSDOwner is Ownable, LSDBase, ILSDOwner {
         );
     }
 
-    // Set the annual profit unit
-    function setApyUnit(uint256 _apyUnit) public override onlyOwner {
+    // Set the staking annual profit
+    function setStakeApr(uint256 _stakeApr) public override onlyOwner {
         setUint(
-            keccak256(abi.encodePacked(ownerSettingNameSpace, "apy.unit")),
-            _apyUnit
+            keccak256(abi.encodePacked(ownerSettingNameSpace, "stake.apr")),
+            _stakeApr
         );
     }
 
@@ -152,11 +124,9 @@ contract LSDOwner is Ownable, LSDBase, ILSDOwner {
     }
 
     // Set the minimum deposit amount
-    function setMinimumDepositAmount(uint256 _minimumDepositAmount)
-        public
-        override
-        onlyOwner
-    {
+    function setMinimumDepositAmount(
+        uint256 _minimumDepositAmount
+    ) public override onlyOwner {
         setUint(
             keccak256(
                 abi.encodePacked(
@@ -168,43 +138,11 @@ contract LSDOwner is Ownable, LSDBase, ILSDOwner {
         );
     }
 
-    // Set the deposit enabled
-    function setDepositEnabled(bool _depositEnabled) public override onlyOwner {
-        setBool(
-            keccak256(
-                abi.encodePacked(ownerSettingNameSpace, "deposit.enabled")
-            ),
-            _depositEnabled
-        );
-    }
-
-    // Set the LSD Token Lock/Unlock
-    function setIsLock(bool _isLock) public override onlyOwner {
-        setBool(
-            keccak256(abi.encodePacked(ownerSettingNameSpace, "lock")),
-            _isLock
-        );
-    }
-
     // Set the multiplier
     function setMultiplier(uint256 _multiplier) public override onlyOwner {
         setUint(
             keccak256(abi.encodePacked(ownerSettingNameSpace, "multiplier")),
             _multiplier
-        );
-    }
-
-    // Set the multiplier unit
-    function setMultiplierUnit(uint256 _multiplierUnit)
-        public
-        override
-        onlyOwner
-    {
-        setUint(
-            keccak256(
-                abi.encodePacked(ownerSettingNameSpace, "multiplier.unit")
-            ),
-            _multiplierUnit
         );
     }
 
@@ -337,9 +275,10 @@ contract LSDOwner is Ownable, LSDBase, ILSDOwner {
     }
 
     // Upgrade a network contract ABI
-    function _upgradeABI(string memory _name, string memory _contractAbi)
-        internal
-    {
+    function _upgradeABI(
+        string memory _name,
+        string memory _contractAbi
+    ) internal {
         // Check ABI exists
         string memory existingAbi = getString(
             keccak256(abi.encodePacked("contract.abi", _name))
@@ -361,26 +300,61 @@ contract LSDOwner is Ownable, LSDBase, ILSDOwner {
     }
 
     // Upgrade a network contract
-    function _upgradeContract(string memory _name, address _contractAddress, string memory _contractAbi) internal {
+    function _upgradeContract(
+        string memory _name,
+        address _contractAddress,
+        string memory _contractAbi
+    ) internal {
         bytes32 nameHash = keccak256(abi.encodePacked(_name));
         // Get old contract address & check contract exists
-        address oldContractAddress = getAddress(keccak256(abi.encodePacked("contract.address", _name)));
+        address oldContractAddress = getAddress(
+            keccak256(abi.encodePacked("contract.address", _name))
+        );
         require(oldContractAddress != address(0x0), "Contract does not exist");
         // Check new contract address
         require(_contractAddress != address(0x0), "Invalid contract address");
-        require(_contractAddress != oldContractAddress, "The contract address cannot be set to its current address");
-        require(!getBool(keccak256(abi.encodePacked("contract.exists", _contractAddress))), "Contract address is already in use");
+        require(
+            _contractAddress != oldContractAddress,
+            "The contract address cannot be set to its current address"
+        );
+        require(
+            !getBool(
+                keccak256(abi.encodePacked("contract.exists", _contractAddress))
+            ),
+            "Contract address is already in use"
+        );
         // Check ABI isn't empty
         require(bytes(_contractAbi).length > 0, "Empty ABI is invalid");
         // Register new contract
-        setBool(keccak256(abi.encodePacked("contract.exists", _contractAddress)), true);
-        setString(keccak256(abi.encodePacked("contract.name", _contractAddress)), _name);
-        setAddress(keccak256(abi.encodePacked("contract.address", _name)), _contractAddress);
-        setString(keccak256(abi.encodePacked("contract.abi", _name)), _contractAbi);
+        setBool(
+            keccak256(abi.encodePacked("contract.exists", _contractAddress)),
+            true
+        );
+        setString(
+            keccak256(abi.encodePacked("contract.name", _contractAddress)),
+            _name
+        );
+        setAddress(
+            keccak256(abi.encodePacked("contract.address", _name)),
+            _contractAddress
+        );
+        setString(
+            keccak256(abi.encodePacked("contract.abi", _name)),
+            _contractAbi
+        );
         // Deregister old contract
-        deleteString(keccak256(abi.encodePacked("contract.name", oldContractAddress)));
-        deleteBool(keccak256(abi.encodePacked("contract.exists", oldContractAddress)));
+        deleteString(
+            keccak256(abi.encodePacked("contract.name", oldContractAddress))
+        );
+        deleteBool(
+            keccak256(abi.encodePacked("contract.exists", oldContractAddress))
+        );
         // Emit contract upgraded event
-        emit ContractUpgraded(nameHash, oldContractAddress, _contractAddress, block.timestamp);
+        emit ContractUpgraded(
+            nameHash,
+            oldContractAddress,
+            _contractAddress,
+            block.timestamp
+        );
     }
 }

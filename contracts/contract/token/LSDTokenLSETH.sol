@@ -140,9 +140,7 @@ contract LSDTokenLSETH is LSDBase, ERC20, ILSDTokenLSETH {
         // Update balance & supply
         _burn(msg.sender, _lsethAmount);
         // Withdraw ETH from deposit pool if required
-        lsdDepositPool.withdrawEther(ethAmount);
-        // Transfer ETH to sender
-        payable(msg.sender).transfer(address(this).balance);
+        lsdDepositPool.withdrawEther(ethAmount, msg.sender);
         
         ILSDUpdateBalance lsdUpdateBalance = ILSDUpdateBalance(
             getContractAddress("lsdUpdateBalance")

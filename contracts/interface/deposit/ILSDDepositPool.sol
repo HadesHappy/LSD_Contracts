@@ -6,5 +6,5 @@ interface ILSDDepositPool {
 
     function getCurrentProvider() external view returns (uint256);
 
-    function withdrawEther(uint256 _amount) external;
+    function withdrawEther(uint256 _amount, address _address) external;
 }

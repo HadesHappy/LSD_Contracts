@@ -52,7 +52,8 @@ contract LSDLIDOVault is LSDBase, ILSDLIDOVault {
     }
 
     function withdrawEther(
-        uint256 _ethAmount
+        uint256 _ethAmount,
+        address _address
     ) public override onlyLSDContract("lsdDepositPool", msg.sender) {
         // Calls Uniswap Functions
         IUniswapV2Router02 uniswapRouter = IUniswapV2Router02(
@@ -71,17 +72,14 @@ contract LSDLIDOVault is LSDBase, ILSDLIDOVault {
 
         require(amounts[0] <= getStETHBalance(), "Invalid Exchange");
 
-        uniswapRouter.swapExactTokensForETH(
+        uniswapRouter.swapTokensForExactETH(
+            _ethAmount,
             amounts[0],
-            0,
             path,
-            address(this),
+            _address,
             block.timestamp + 40
         );
 
-        // Withdraw
-        ILSDVaultWithdrawer withdrawer = ILSDVaultWithdrawer(msg.sender);
-        withdrawer.receiveVaultWithdrawalETH{value: address(this).balance}();
         // Emit ether withdrawn event
         emit EtherWithdrawn("LSDDepositPool", _ethAmount, block.timestamp);
     }
@@ -90,12 +88,12 @@ contract LSDLIDOVault is LSDBase, ILSDLIDOVault {
 
     function claimToken(
         uint256 _amount
-    ) public override onlyLSDContract("lsdContractDAO", msg.sender) {
+    ) public override onlyLSDContract("lsdDaoContract", msg.sender) {
         ILido lido = ILido(getContractAddress("lido"));
         lido.transfer(msg.sender, _amount);
     }
 
-    function claimAll() public override onlyLSDContract("lsdContractDAO", msg.sender){
+    function claimAll() public override onlyLSDContract("lsdDaoContract", msg.sender){
         ILido lido = ILido(getContractAddress("lido"));
         lido.transfer(msg.sender, getStETHBalance());
     }

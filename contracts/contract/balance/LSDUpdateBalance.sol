@@ -57,13 +57,12 @@ contract LSDUpdateBalance is LSDBase, ILSDUpdateBalance {
             setVirtualETHBalanceTime(lastTime + dayPassed * ONE_DAY_IN_SECS);
             ILSDOwner lsdOwner = ILSDOwner(getContractAddress("lsdOwner"));
             uint256 apy = lsdOwner.getApy();
-            uint256 apyUnit = lsdOwner.getApyUnit();
             uint256 virtualETHBalance = getVirtualETHBalance();
             setVirtualETHBalance(
                 virtualETHBalance +
                     (virtualETHBalance * dayPassed * apy) /
                     365 /
-                    (10 ** apyUnit)
+                    (10 ** 4)
             );
         }
     }
