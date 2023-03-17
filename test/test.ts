@@ -52,7 +52,7 @@ describe("LSD", function () {
     await lsdOwner.upgrade("addContract", "lsdLIDOVault", '1', lsdLIDOVault.address);
     await lsdOwner.upgrade("addContract", "lsdStorage", '1', lsdStorage.address);
     await lsdOwner.upgrade("addContract", "lsdToken", '1', lsdToken.address);
-    await lsdOwner.upgrade("addContract", "lsdDaoContract", '1', otherAccount.address);
+    await lsdOwner.upgrade("addContract", "lsdDaoContract", '1', owner.address);
     await lsdOwner.upgrade("addContract", "lido", '1', "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84");
     await lsdOwner.upgrade("addContract", "weth", '1', "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2");
     await lsdOwner.upgrade("addContract", "uniswapRouter", '1', "0x7a250d5630b4cf539739df2c5dacb4c659f2488d");
@@ -197,23 +197,21 @@ describe("LSD", function () {
       await time.increase(365 * 24 * 60 * 60);
       await lsdToken.mint(ethers.utils.parseUnits('1', 9));
       await lsdStakingPool.stakeLSD(ethers.utils.parseUnits('1', 9));
-      console.log("user: ", await lsdStakingPool.getUser(owner.address))
       console.log("before claim bonus: ", Number(await lsdStakingPool.getClaimAmount(owner.address)));
 
       // await time.increase(365 * 24 * 60 * 60);
       await lsdStakingPool.claim();
       console.log("after claim bonus: ", Number(await lsdStakingPool.getClaimAmount(owner.address)));
-      // console.log("user: ", await lsdStakingPool.getUser(owner.address))
       await time.increase(365 * 24 * 60 * 60);
       console.log("after one year claim bonus: ", Number(await lsdStakingPool.getClaimAmount(owner.address)));
 
-      console.log('before unstake: ', Number(await lsdTokenVELSD.balanceOf(owner.address)));
-      console.log('before user: ', await lsdStakingPool.getUser(owner.address));
+      console.log('before unstake: ', Number(await lsdStakingPool.getTotalLSD()));
       await lsdStakingPool.unstakeLSD(ethers.utils.parseUnits("1", 9));
-      console.log("after unstake: ", await lsdStakingPool.getUser(owner.address))
-      console.log('after unstake: ', Number(await lsdTokenVELSD.balanceOf(owner.address)))
+      console.log('after unstake: ', Number(await lsdStakingPool.getTotalLSD()))
       await time.increase(182 * 24 * 60 * 60);
       console.log("after one year claim bonus: ", Number(await lsdStakingPool.getClaimAmount(owner.address)));
+      await lsdStakingPool.removeLSD(ethers.utils.parseUnits("0.6", 9))
+      console.log('after remove: ', Number(await lsdStakingPool.getTotalLSD()))
 
       // await lsdStakingPool.unstakeLSD(ethers.utils.parseUnits('1', 9));
       // await lsdTokenVELSD.transfer(otherAccount.address, ethers.utils.parseUnits('1', 9));

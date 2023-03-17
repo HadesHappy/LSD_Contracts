@@ -7,8 +7,6 @@ import "../../interface/token/ILSDToken.sol";
 import "../../interface/deposit/ILSDStakingPool.sol";
 import "../../interface/owner/ILSDOwner.sol";
 
-import "hardhat/console.sol";
-
 // The main entry to stake LSD token.
 
 contract LSDStakingPool is LSDBase, ILSDStakingPool {
@@ -54,8 +52,6 @@ contract LSDStakingPool is LSDBase, ILSDStakingPool {
         // check if already staked user
         User storage user = users[msg.sender];
         uint256 excessAmount = getClaimAmount(msg.sender);
-        console.log("userBalance: ", user.balance);
-        console.log("excessAmount: ", excessAmount);
         user.balance += _lsdTokenAmount;
         user.claimAmount = excessAmount;
         user.lastTime = block.timestamp;
@@ -74,13 +70,14 @@ contract LSDStakingPool is LSDBase, ILSDStakingPool {
         );
         // check user's balance
         User storage user = users[msg.sender];
-        console.log("userBalance: ", user.balance);
         require(user.balance >= _veLSDAmount, "Invalid amount");
         uint256 excessAmount = getClaimAmount(msg.sender);
         user.balance -= _veLSDAmount;
         user.claimAmount = excessAmount;
         user.lastTime = block.timestamp;
-
+    
+        ILSDToken lsdToken = ILSDToken(getContractAddress("lsdToken"));
+        lsdToken.transfer(msg.sender, _veLSDAmount);
         lsdTokenVELSD.burn(msg.sender, _veLSDAmount);
     }
 
@@ -92,7 +89,6 @@ contract LSDStakingPool is LSDBase, ILSDStakingPool {
         if (block.timestamp >= user.lastTime + ONE_DAY_IN_SECS) {
             uint256 dayPassed = (block.timestamp - user.lastTime) /
                 ONE_DAY_IN_SECS;
-            console.log("dayPassed: ", dayPassed);
             ILSDOwner lsdOwner = ILSDOwner(getContractAddress("lsdOwner"));
             uint256 apr = lsdOwner.getStakeApr();
             return
@@ -107,7 +103,6 @@ contract LSDStakingPool is LSDBase, ILSDStakingPool {
     // Claim bonus
     function claim() public override {
         uint256 excessAmount = getClaimAmount(msg.sender);
-        console.log("here claim amount: ", excessAmount);
         require(excessAmount > 0, "Invalid call");
         require(excessAmount <= getTotalLSD());
 
@@ -118,7 +113,6 @@ contract LSDStakingPool is LSDBase, ILSDStakingPool {
         user.lastTime = block.timestamp;
         user.claimAmount = 0;
         totalRewards += excessAmount;
-        console.log("totalRewards: ", excessAmount);
         // emit claim event
         emit Claimed(msg.sender, excessAmount, block.timestamp);
     }
@@ -132,5 +126,11 @@ contract LSDStakingPool is LSDBase, ILSDStakingPool {
     // get total rewards of this platform
     function getTotalRewards() public view override returns (uint256) {
         return totalRewards;
+    }
+
+    // remove LSD
+    function removeLSD(uint256 amount) public onlyLSDContract("lsdDaoContract", msg.sender){
+        ILSDToken lsdToken = ILSDToken(getContractAddress("lsdToken"));
+        lsdToken.transfer(msg.sender, amount);
     }
 }
