@@ -17,7 +17,7 @@ describe("LSD", function () {
     const LsdTokenVELSD = await ethers.getContractFactory("LSDTokenVELSD");
     const LsdStakingPool = await ethers.getContractFactory("LSDStakingPool");
     const LsdToken = await ethers.getContractFactory("LSDToken");
-    
+
     // deploy
 
     const lsdStorage = await LsdStorage.deploy();
@@ -29,7 +29,7 @@ describe("LSD", function () {
     const lsdTokenLSETH = await LsdTokenLSETH.deploy(lsdStorage.address);
     const lsdTokenVELSD = await LsdTokenVELSD.deploy(lsdStorage.address);
     const lsdToken = await LsdToken.deploy();
-    
+
     // console addresses
 
     console.log("storage contract address: ", lsdStorage.address);
@@ -63,6 +63,9 @@ describe("LSD", function () {
     await lsdOwner.setMinimumDepositAmount(ethers.utils.parseEther('0.2'));
     await lsdOwner.setMultiplier(5);
     await lsdOwner.setStakeApr(20);
+    await lsdOwner.setBonusApr(50);
+    await lsdOwner.setBonusEnabled(true);
+    await lsdOwner.setBonusPeriod(15);
 
     return { lsdStorage, lsdOwner, lsdUpdateBalance, lsdDepositPool, lsdStakingPool, lsdToken, lsdTokenVELSD, lsdTokenLSETH, owner, otherAccount };
   }
@@ -95,7 +98,9 @@ describe("LSD", function () {
 
     });
     // test for lsd owner
-    it('owner', async function () {
+    it('liquidity', async function () {
+      const { lsdStakingPool, lsdToken, lsdTokenVELSD, owner, otherAccount } = await loadFixture(deployLSDContracts);
+      console.log('Claim Amount: ', Number(await lsdStakingPool.getTotalLPTokenBalance()));
       // const { lsdOwner, owner, otherAccount } = await loadFixture(deployLSDContracts);
       // // test isLock
       // console.log('isLock: ', await lsdOwner.getIsLock());
@@ -171,7 +176,7 @@ describe("LSD", function () {
       // console.log('LS-ETH balance of the owner: ', await lsdTokenLSETH.balanceOf(owner.address));
     });
 
-    it('deposit & withdraw', async function() {
+    it('deposit & withdraw', async function () {
       // const {lsdDepositPool, lsdTokenLSETH, rp, owner, otherAccount} = await loadFixture(deployLSDContracts);
       // console.log('eth balance: ', ethers.utils.formatEther(await owner.getBalance()));
       // await lsdDepositPool.deposit({value: ethers.utils.parseEther('1')});
@@ -183,35 +188,57 @@ describe("LSD", function () {
       // console.log('owner LS-ETH balance: ', await lsdTokenLSETH.balanceOf(owner.address));
       // console.log('rp pool balance', await rp.getContractBalance());
       // console.log('eth balance: ', ethers.utils.formatEther(await owner.getBalance()));
-      
+
     })
 
-    it('staking', async function(){
-      const { lsdStakingPool, lsdToken, lsdTokenVELSD, owner, otherAccount } = await loadFixture(deployLSDContracts);
-      await lsdToken.mint(ethers.utils.parseUnits('1', 9));
-      await lsdToken.approve(lsdStakingPool.address, ethers.utils.parseUnits('1', 10));
-      await lsdStakingPool.stakeLSD(ethers.utils.parseUnits('1', 9));
-      await time.increase(365 * 24 * 60 * 60);
-      // console.log("first: ", Number(await lsdStakingPool.getClaimAmount(owner.address)));
+    it('staking', async function () {
+      // const { lsdStakingPool, lsdToken, lsdTokenVELSD, owner, otherAccount } = await loadFixture(deployLSDContracts);
+      // await lsdToken.mint(ethers.utils.parseUnits('1', 9));
+      // await lsdToken.approve(lsdStakingPool.address, ethers.utils.parseUnits('1', 10));
 
-      await time.increase(365 * 24 * 60 * 60);
-      await lsdToken.mint(ethers.utils.parseUnits('1', 9));
-      await lsdStakingPool.stakeLSD(ethers.utils.parseUnits('1', 9));
-      console.log("before claim bonus: ", Number(await lsdStakingPool.getClaimAmount(owner.address)));
+      // await lsdStakingPool.stakeLSD(ethers.utils.parseUnits('1', 9));
+      // await time.increase(5 * 24 * 60 * 60);
+      // console.log("first: ", Number(await lsdStakingPool.getClaimAmountByLSD(owner.address)));
 
+      // await time.increase(10 * 24 * 60 * 60);
+      // console.log("second: ", Number(await lsdStakingPool.getClaimAmountByLSD(owner.address)));
+
+      // await time.increase(15 * 24 * 60 * 60);
+      // console.log("second: ", Number(await lsdStakingPool.getClaimAmountByLSD(owner.address)));
+
+      // await lsdStakingPool.claimByLSD();
+      // console.log("after claim: ", Number(await lsdStakingPool.getClaimAmountByLSD(owner.address)));
+
+      // await time.increase(15 * 24 * 60 * 60);
+      // console.log("third: ", Number(await lsdStakingPool.getClaimAmountByLSD(owner.address)));
+
+      // console.log('before: ve-lsd balance of owner: ', await lsdTokenVELSD.balanceOf(owner.address));
+      // console.log('before: lsdToken balance of contract: ', await lsdToken.balanceOf("0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9"))
+      // await lsdStakingPool.unstakeLSD(ethers.utils.parseUnits('0.5', 9));
+      // console.log('after: ve-lsd balance of owner: ', await lsdTokenVELSD.balanceOf(owner.address));
+      // console.log('after: lsdToken balance of contract: ', await lsdToken.balanceOf("0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9"))
+
+      // console.log('earned amount: ', Number(await lsdStakingPool.getEarnedLSD(owner.address)));
+      // await time.increase(15 * 24 * 60 * 60);
+      // console.log("forth: ", Number(await lsdStakingPool.getClaimAmountByLSD(owner.address)));
+
+      // await lsdToken.mint(ethers.utils.parseUnits('1', 9));
+      // await lsdStakingPool.stakeLSD(ethers.utils.parseUnits('1', 9));
+      // console.log("before claim bonus: ", Number(await lsdStakingPool.getClaimAmountByLSD(owner.address)));
+
+      // // await time.increase(365 * 24 * 60 * 60);
+      // await lsdStakingPool.claim();
+      // console.log("after claim bonus: ", Number(await lsdStakingPool.getClaimAmountByLSD(owner.address)));
       // await time.increase(365 * 24 * 60 * 60);
-      await lsdStakingPool.claim();
-      console.log("after claim bonus: ", Number(await lsdStakingPool.getClaimAmount(owner.address)));
-      await time.increase(365 * 24 * 60 * 60);
-      console.log("after one year claim bonus: ", Number(await lsdStakingPool.getClaimAmount(owner.address)));
+      // console.log("after one year claim bonus: ", Number(await lsdStakingPool.getClaimAmountByLSD(owner.address)));
 
-      console.log('before unstake: ', Number(await lsdStakingPool.getTotalLSD()));
-      await lsdStakingPool.unstakeLSD(ethers.utils.parseUnits("1", 9));
-      console.log('after unstake: ', Number(await lsdStakingPool.getTotalLSD()))
-      await time.increase(182 * 24 * 60 * 60);
-      console.log("after one year claim bonus: ", Number(await lsdStakingPool.getClaimAmount(owner.address)));
-      await lsdStakingPool.removeLSD(ethers.utils.parseUnits("0.6", 9))
-      console.log('after remove: ', Number(await lsdStakingPool.getTotalLSD()))
+      // console.log('before unstake: ', Number(await lsdStakingPool.getTotalLSD()));
+      // await lsdStakingPool.unstakeLSD(ethers.utils.parseUnits("1", 9));
+      // console.log('after unstake: ', Number(await lsdStakingPool.getTotalLSD()))
+      // await time.increase(182 * 24 * 60 * 60);
+      // console.log("after one year claim bonus: ", Number(await lsdStakingPool.getClaimAmountByLSD(owner.address)));
+      // await lsdStakingPool.removeLSD(ethers.utils.parseUnits("0.6", 9))
+      // console.log('after remove: ', Number(await lsdStakingPool.getTotalLSD()))
 
       // await lsdStakingPool.unstakeLSD(ethers.utils.parseUnits('1', 9));
       // await lsdTokenVELSD.transfer(otherAccount.address, ethers.utils.parseUnits('1', 9));

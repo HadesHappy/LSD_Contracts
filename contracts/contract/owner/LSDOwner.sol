@@ -41,7 +41,37 @@ contract LSDOwner is Ownable, LSDBase, ILSDOwner {
     // Get the staking annual profit
     function getStakeApr() public view override returns (uint256) {
         return
-            getUint(keccak256(abi.encodePacked(ownerSettingNameSpace, "stake.apr")));
+            getUint(
+                keccak256(abi.encodePacked(ownerSettingNameSpace, "stake.apr"))
+            );
+    }
+
+    // Get bonus apr
+    function getBonusApr() public view override returns (uint256) {
+        return
+            getUint(
+                keccak256(abi.encodePacked(ownerSettingNameSpace, "bonus.apr"))
+            );
+    }
+
+    // Get bonus period
+    function getBonusPeriod() public view override returns (uint256) {
+        return
+            getUint(
+                keccak256(
+                    abi.encodePacked(ownerSettingNameSpace, "bonus.period")
+                )
+            );
+    }
+
+    // Get bonus apr enabled
+    function getBonusEnabled() public view override returns (bool) {
+        return
+            getBool(
+                keccak256(
+                    abi.encodePacked(ownerSettingNameSpace, "bonus.enabled")
+                )
+            );
     }
 
     // Get the LIDO Apy
@@ -112,6 +142,30 @@ contract LSDOwner is Ownable, LSDBase, ILSDOwner {
         setUint(
             keccak256(abi.encodePacked(ownerSettingNameSpace, "stake.apr")),
             _stakeApr
+        );
+    }
+
+    // Set the bonus apr
+    function setBonusApr(uint256 _bonusApr) public override onlyOwner {
+        setUint(
+            keccak256(abi.encodePacked(ownerSettingNameSpace, "bonus.apr")),
+            _bonusApr
+        );
+    }
+
+    // Set bonus period
+    function setBonusPeriod(uint256 _bonusPeriod) public override onlyOwner {
+        setUint(
+            keccak256(abi.encodePacked(ownerSettingNameSpace, "bonus.period")),
+            _bonusPeriod
+        );
+    }
+
+    // Set the staking annual profit
+    function setBonusEnabled(bool _bonusEnabled) public override onlyOwner {
+        setBool(
+            keccak256(abi.encodePacked(ownerSettingNameSpace, "bonus.enabled")),
+            _bonusEnabled
         );
     }
 

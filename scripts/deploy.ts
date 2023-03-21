@@ -17,7 +17,7 @@ async function main() {
    * deploy
    */
   // const lsdStorage = await LsdStorage.deploy();
-  // const lsdOwner = await LsdOwner.deploy(lsdStorage.address);
+  // const lsdOwner = await LsdOwner.deploy("0xC1D358ad6580F232796262aAf3F2EE2FA5E9b484");
   // const lsdUpdateBalance = await LsdUpdateBalance.deploy(lsdStorage.address);
 
   // const lsdDepositPool = await LsdDepositPool.deploy(lsdStorage.address);

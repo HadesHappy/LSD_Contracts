@@ -6,6 +6,12 @@ interface ILSDOwner {
 
     function getStakeApr() external view returns (uint256);
 
+    function getBonusApr() external view returns (uint256);
+
+    function getBonusEnabled() external view returns (bool);
+
+    function getBonusPeriod() external view returns (uint256);
+
     function getMultiplier() external view returns (uint256);
 
     function getLIDOApy() external view returns (uint256);
@@ -22,6 +28,12 @@ interface ILSDOwner {
 
     function setStakeApr(uint256 _stakeApr) external;
 
+    function setBonusApr(uint256 _bonusApr) external;
+
+    function setBonusPeriod(uint256 _bonusPeriod) external;
+
+    function setBonusEnabled(bool _bonusEnabled) external;
+
     function setMultiplier(uint256 _multiplier) external;
 
     function setRPApy(uint256 _rpApy) external;
@@ -34,5 +46,10 @@ interface ILSDOwner {
 
     function setMinimumDepositAmount(uint256 _minimumDepositAmount) external;
 
-    function upgrade(string memory _type, string memory _name, string memory _contractAbi, address _contractAddress) external;
+    function upgrade(
+        string memory _type,
+        string memory _name,
+        string memory _contractAbi,
+        address _contractAddress
+    ) external;
 }
