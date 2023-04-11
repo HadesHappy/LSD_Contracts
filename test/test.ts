@@ -8,71 +8,99 @@ describe("LSD", function () {
   async function deployLSDContracts() {
     // Contracts are deployed using the first signer/account by default
     const [owner, otherAccount] = await ethers.getSigners();
-    const LsdStorage = await ethers.getContractFactory("LSDStorage");
-    const LsdOwner = await ethers.getContractFactory("LSDOwner");
-    const LsdUpdateBalance = await ethers.getContractFactory("LSDUpdateBalance");
-    const LsdDepositPool = await ethers.getContractFactory("LSDDepositPool");
-    const LsdTokenLSETH = await ethers.getContractFactory("LSDTokenLSETH");
-    const LsdLIDOVault = await ethers.getContractFactory("LSDLIDOVault");
-    const LsdTokenVELSD = await ethers.getContractFactory("LSDTokenVELSD");
-    const LsdStakingPool = await ethers.getContractFactory("LSDStakingPool");
-    const LsdToken = await ethers.getContractFactory("LSDToken");
+    const testContract = await ethers.getContractFactory("Test");
+    const test = await testContract.deploy();
+    // const LsdStorage = await ethers.getContractFactory("LSDStorage");
+    // const LsdOwner = await ethers.getContractFactory("LSDOwner");
+    // const LsdUpdateBalance = await ethers.getContractFactory("LSDUpdateBalance");
+    // const LsdDepositPool = await ethers.getContractFactory("LSDDepositPool");
+    // const LsdTokenLSETH = await ethers.getContractFactory("LSDTokenLSETH");
+    // const LsdLIDOVault = await ethers.getContractFactory("LSDLIDOVault");
+    // const LsdTokenVELSD = await ethers.getContractFactory("LSDTokenVELSD");
+    // const LsdStakingPool = await ethers.getContractFactory("LSDStakingPool");
+    // const LsdToken = await ethers.getContractFactory("LSDToken");
 
     // deploy
 
-    const lsdStorage = await LsdStorage.deploy();
-    const lsdOwner = await LsdOwner.deploy(lsdStorage.address);
-    const lsdUpdateBalance = await LsdUpdateBalance.deploy(lsdStorage.address);
-    const lsdDepositPool = await LsdDepositPool.deploy(lsdStorage.address);
-    const lsdStakingPool = await LsdStakingPool.deploy(lsdStorage.address);
-    const lsdLIDOVault = await LsdLIDOVault.deploy(lsdStorage.address);
-    const lsdTokenLSETH = await LsdTokenLSETH.deploy(lsdStorage.address);
-    const lsdTokenVELSD = await LsdTokenVELSD.deploy(lsdStorage.address);
-    const lsdToken = await LsdToken.deploy();
+    // const lsdStorage = await LsdStorage.deploy();
+    // const lsdOwner = await LsdOwner.deploy(lsdStorage.address);
+    // const lsdUpdateBalance = await LsdUpdateBalance.deploy(lsdStorage.address);
+    // const lsdDepositPool = await LsdDepositPool.deploy(lsdStorage.address);
+    // const lsdStakingPool = await LsdStakingPool.deploy(lsdStorage.address);
+    // const lsdLIDOVault = await LsdLIDOVault.deploy(lsdStorage.address);
+    // const lsdTokenLSETH = await LsdTokenLSETH.deploy(lsdStorage.address);
+    // const lsdTokenVELSD = await LsdTokenVELSD.deploy(lsdStorage.address);
+    // const lsdToken = await LsdToken.deploy();
 
     // console addresses
 
-    console.log("storage contract address: ", lsdStorage.address);
-    console.log("owner contract address: ", lsdOwner.address);
-    console.log("updateBalance contract address: ", lsdUpdateBalance.address);
-    console.log("depositPool contract address: ", lsdDepositPool.address);
-    console.log("token LS-ETH contract address: ", lsdTokenLSETH.address);
-    console.log("token VE-LSD contract address: ", lsdTokenVELSD.address);
-    console.log("lido vault contract address: ", lsdLIDOVault.address);
-    console.log("staking pool contract address: ", lsdStakingPool.address);
-    console.log("lsdToken address: ", lsdToken.address);
+    // console.log("storage contract address: ", lsdStorage.address);
+    // console.log("owner contract address: ", lsdOwner.address);
+    // console.log("updateBalance contract address: ", lsdUpdateBalance.address);
+    // console.log("depositPool contract address: ", lsdDepositPool.address);
+    // console.log("token LS-ETH contract address: ", lsdTokenLSETH.address);
+    // console.log("token VE-LSD contract address: ", lsdTokenVELSD.address);
+    // console.log("lido vault contract address: ", lsdLIDOVault.address);
+    // console.log("staking pool contract address: ", lsdStakingPool.address);
+    // console.log("lsdToken address: ", lsdToken.address);
 
     // Add Contract to the Storage
-    await lsdOwner.upgrade("addContract", "lsdOwner", '1', lsdOwner.address);
-    await lsdOwner.upgrade("addContract", "lsdUpdateBalance", '1', lsdUpdateBalance.address);
-    await lsdOwner.upgrade("addContract", "lsdDepositPool", '1', lsdDepositPool.address);
-    await lsdOwner.upgrade("addContract", "lsdStakingPool", '1', lsdStakingPool.address);
-    await lsdOwner.upgrade("addContract", "lsdTokenLSETH", '1', lsdTokenLSETH.address);
-    await lsdOwner.upgrade("addContract", "lsdTokenVELSD", '1', lsdTokenVELSD.address);
-    await lsdOwner.upgrade("addContract", "lsdLIDOVault", '1', lsdLIDOVault.address);
-    await lsdOwner.upgrade("addContract", "lsdStorage", '1', lsdStorage.address);
-    await lsdOwner.upgrade("addContract", "lsdToken", '1', lsdToken.address);
-    await lsdOwner.upgrade("addContract", "lsdDaoContract", '1', owner.address);
-    await lsdOwner.upgrade("addContract", "lido", '1', "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84");
-    await lsdOwner.upgrade("addContract", "weth", '1', "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2");
-    await lsdOwner.upgrade("addContract", "uniswapRouter", '1', "0x7a250d5630b4cf539739df2c5dacb4c659f2488d");
+    // await lsdOwner.upgrade("addContract", "lsdOwner", '1', lsdOwner.address);
+    // await lsdOwner.upgrade("addContract", "lsdUpdateBalance", '1', lsdUpdateBalance.address);
+    // await lsdOwner.upgrade("addContract", "lsdDepositPool", '1', lsdDepositPool.address);
+    // await lsdOwner.upgrade("addContract", "lsdStakingPool", '1', lsdStakingPool.address);
+    // await lsdOwner.upgrade("addContract", "lsdTokenLSETH", '1', lsdTokenLSETH.address);
+    // await lsdOwner.upgrade("addContract", "lsdTokenVELSD", '1', lsdTokenVELSD.address);
+    // await lsdOwner.upgrade("addContract", "lsdLIDOVault", '1', lsdLIDOVault.address);
+    // await lsdOwner.upgrade("addContract", "lsdStorage", '1', lsdStorage.address);
+    // await lsdOwner.upgrade("addContract", "lsdToken", '1', lsdToken.address);
+    // await lsdOwner.upgrade("addContract", "lsdDaoContract", '1', owner.address);
+    // await lsdOwner.upgrade("addContract", "lido", '1', "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84");
+    // await lsdOwner.upgrade("addContract", "weth", '1', "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2");
+    // await lsdOwner.upgrade("addContract", "uniswapRouter", '1', "0x7a250d5630b4cf539739df2c5dacb4c659f2488d");
 
     // Set Owner Settings
-    await lsdOwner.setLIDOApy(4);
-    await lsdOwner.setApy(5);
-    await lsdOwner.setMinimumDepositAmount(ethers.utils.parseEther('0.2'));
-    await lsdOwner.setMultiplier(5);
-    await lsdOwner.setStakeApr(20);
-    await lsdOwner.setBonusApr(50);
-    await lsdOwner.setBonusEnabled(true);
-    await lsdOwner.setBonusPeriod(15);
+    // await lsdOwner.setLIDOApy(4);
+    // await lsdOwner.setApy(5);
+    // await lsdOwner.setMinimumDepositAmount(ethers.utils.parseEther('0.2'));
+    // await lsdOwner.setMultiplier(5);
+    // await lsdOwner.setStakeApr(20);
+    // await lsdOwner.setBonusApr(50);
+    // await lsdOwner.setBonusEnabled(true);
+    // await lsdOwner.setBonusPeriod(15);
 
-    return { lsdStorage, lsdOwner, lsdUpdateBalance, lsdDepositPool, lsdStakingPool, lsdToken, lsdTokenVELSD, lsdTokenLSETH, owner, otherAccount };
+    // return { lsdStorage, lsdOwner, lsdUpdateBalance, lsdDepositPool, lsdStakingPool, lsdToken, lsdTokenVELSD, lsdTokenLSETH, owner, otherAccount };
+    return { test, owner };
   }
 
   describe('deploy & guardian', async function () {
     // test for lsd storage
     it('guardian', async function () {
+      const { test, owner } = await loadFixture(deployLSDContracts);
+      const ONE_DAY = 60 * 60 * 24;
+      await time.increase(365 * ONE_DAY);
+      await test.claim();
+
+      await test.setBonusCampaign()
+      await time.increase(91 * ONE_DAY);
+      await test.setBonusApr(100);
+      // console.log(await test.getIsBonusPeriod());
+      // // await test.setMainApr(10);
+      // // await time.increase(10 * 24 * 60 * 60);
+      // // await test.setBonusCampaign()
+      // await time.increase(365 * 24 * 60 * 60);
+
+      console.log(await test.getClaimAmount(owner.address))
+      // console.log('0: ', await test.getHistories(0))
+      // console.log('1: ', await test.getHistories(1))
+      // console.log('2: ', await test.getHistories(2))
+      // console.log('3: ', await test.getHistories(3))
+      // console.log('4: ', await test.getHistories(4))
+      // console.log('5: ', await test.getHistories(5))
+
+      // await time.increase(10 * 24 * 60 * 60);
+      // await test.setBonusCampaign()
+      // await time.increase(10 * 24 * 60 * 60);
       // keys
       // console.log('lido key: ', ethers.utils.keccak256(ethers.utils.solidityPack(['string', 'string'], ["contract.address", "lido"])));
       // console.log('uniswapRouter key: ', ethers.utils.keccak256(ethers.utils.solidityPack(['string', 'string'], ["contract.address", "uniswapRouter"])));
@@ -99,8 +127,8 @@ describe("LSD", function () {
     });
     // test for lsd owner
     it('liquidity', async function () {
-      const { lsdStakingPool, lsdToken, lsdTokenVELSD, owner, otherAccount } = await loadFixture(deployLSDContracts);
-      console.log('Claim Amount: ', Number(await lsdStakingPool.getTotalLPTokenBalance()));
+      // const { lsdStakingPool, lsdToken, lsdTokenVELSD, owner, otherAccount } = await loadFixture(deployLSDContracts);
+      // console.log('Claim Amount: ', Number(await lsdStakingPool.getTotalLPTokenBalance()));
       // const { lsdOwner, owner, otherAccount } = await loadFixture(deployLSDContracts);
       // // test isLock
       // console.log('isLock: ', await lsdOwner.getIsLock());

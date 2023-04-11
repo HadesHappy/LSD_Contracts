@@ -25,14 +25,14 @@ contract LSDTokenVELSD is LSDBase, ERC20, ILSDTokenVELSD {
     function mint(
         address _address,
         uint256 _amount
-    ) public override onlyLSDContract("lsdStakingPool", msg.sender) {
+    ) public override onlyLSDContract("lsdTokenStaking", msg.sender) {
         _mint(_address, _amount);
-    }
+    } 
 
     function burn(
         address _address,
         uint256 _amount
-    ) public override onlyLSDContract("lsdStakingPool", msg.sender) {
+    ) public override onlyLSDContract("lsdTokenStaking", msg.sender) {
         _burn(_address, _amount);
     }
 

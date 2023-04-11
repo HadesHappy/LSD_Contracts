@@ -6,13 +6,15 @@ async function main() {
   // const LsdUpdateBalance = await ethers.getContractFactory("LSDUpdateBalance");
   // // pools
   // const LsdDepositPool = await ethers.getContractFactory("LSDDepositPool");
-  const LsdStakingPool = await ethers.getContractFactory("LSDStakingPool");
+  const LsdLpTokenStaking = await ethers.getContractFactory("LSDLpTokenStaking");
+
+  // const LsdTokenStaking = await ethers.getContractFactory("LSDTokenStaking");
+  // const LsdTokenVault = await ethers.getContractFactory("LSDTokenVault");
   // tokens
   // const LsdTokenLSETH = await ethers.getContractFactory("LSDTokenLSETH");
   // const LsdTokenVELSD = await ethers.getContractFactory("LSDTokenVELSD");
   // // vault
   // const LsdLIDOVault = await ethers.getContractFactory("LSDLIDOVault");
-
   /**
    * deploy
    */
@@ -21,7 +23,10 @@ async function main() {
   // const lsdUpdateBalance = await LsdUpdateBalance.deploy(lsdStorage.address);
 
   // const lsdDepositPool = await LsdDepositPool.deploy(lsdStorage.address);
-  const lsdStakingPool = await LsdStakingPool.deploy("0xC1D358ad6580F232796262aAf3F2EE2FA5E9b484");
+  const lsdLpTokenStaking = await LsdLpTokenStaking.deploy("0xC1D358ad6580F232796262aAf3F2EE2FA5E9b484");
+
+  // const lsdTokenStaking = await LsdTokenStaking.deploy("0xC1D358ad6580F232796262aAf3F2EE2FA5E9b484");
+  // const lsdTokenVault = await LsdTokenVault.deploy("0xC1D358ad6580F232796262aAf3F2EE2FA5E9b484");
 
   // const lsdTokenLSETH = await LsdTokenLSETH.deploy(lsdStorage.address);
   // const lsdTokenVELSD = await LsdTokenVELSD.deploy(lsdStorage.address);
@@ -34,7 +39,9 @@ async function main() {
   // console.log(`LSD Update Balance deployed to ${lsdUpdateBalance.address}`);
 
   // console.log(`LSD Deposit Pool deployed to ${lsdDepositPool.address}`);
-  console.log(`LSD Staking Pool deployed to ${lsdStakingPool.address}`);
+  // console.log(`LSD Staking Pool deployed to ${lsdTokenStaking.address}`);
+  // console.log(`LSD Token Vault deployed to ${lsdTokenVault.address}`);
+  console.log(`LP Token Staking deployed to ${lsdLpTokenStaking.address}`);
 
   // console.log(`LSD TokenLSETH deployed to ${lsdTokenLSETH.address}`);
   // console.log(`LSD TokenVELSD deployed to ${lsdTokenVELSD.address}`);
