@@ -86,21 +86,4 @@ contract LSDTokenVault is LSDBase, ILSDTokenVault {
         emit LSDTokenClaimed(_address, amount, block.timestamp);
     }
 
-    function removeLsd(
-        uint256 amount
-    ) public onlyLSDContract("lsdDaoContract", msg.sender) {
-        ILSDToken lsdToken = ILSDToken(getContractAddress("lsdToken"));
-        require(lsdToken.balanceOf(address(this)) >= amount, "Invalid amount");
-
-        lsdToken.transfer(getContractAddress("lsdDaoContract"), amount);
-    }
-
-    function removeLp(
-        uint256 amount
-    ) public onlyLSDContract("lsdDaoContract", msg.sender) {
-        IUniswapV2Pair pairToken = IUniswapV2Pair(uniLPAddress);
-        require(pairToken.balanceOf(address(this)) >= amount, "Invalid amount");
-
-        pairToken.transfer(getContractAddress("lsdDaoContract"), amount);
-    }
 }
