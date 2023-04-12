@@ -10,9 +10,7 @@ interface ILSDLpTokenStaking {
 
     function getTotalLPTokenBalance() external view returns (uint256);
 
-    function getClaimAmount(
-        address _address
-    ) external view returns (uint256);
+    function getClaimAmount(address _address) external view returns (uint256);
 
     function claim() external;
 
@@ -29,6 +27,8 @@ interface ILSDLpTokenStaking {
     function getMainApr() external view returns (uint256);
 
     function getIsBonusPeriod() external view returns (uint256);
+
+    function getStakers() external view returns (uint256);
 
     function setBonusApr(uint256 _bonusApr) external;
 

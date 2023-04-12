@@ -78,12 +78,16 @@ describe("LSD", function () {
     it('guardian', async function () {
       const { test, owner } = await loadFixture(deployLSDContracts);
       const ONE_DAY = 60 * 60 * 24;
+      await test.stake(100)
       await time.increase(365 * ONE_DAY);
-      await test.claim();
-
+      // await test.claim();
       await test.setBonusCampaign()
-      await time.increase(91 * ONE_DAY);
-      await test.setBonusApr(100);
+      // await test.stake(100)
+      await time.increase(365 * ONE_DAY);
+      // await test.stake(100)
+      await time.increase(365 * ONE_DAY);
+
+      // await test.setBonusApr(100);
       // console.log(await test.getIsBonusPeriod());
       // // await test.setMainApr(10);
       // // await time.increase(10 * 24 * 60 * 60);

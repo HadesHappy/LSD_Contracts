@@ -24,6 +24,8 @@ interface ILSDTokenStaking {
 
     function getIsBonusPeriod() external view returns (uint256);
 
+    function getStakers() external view returns (uint256);
+
     function setBonusApr(uint256 _bonusApr) external;
 
     function setBonusPeriod(uint256 _bonusPerios) external;

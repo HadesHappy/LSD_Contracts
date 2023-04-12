@@ -43,6 +43,7 @@ contract LSDLpTokenStaking is LSDBase, ILSDLpTokenStaking {
     uint256 private bonusPeriod = 15;
     uint256 private bonusApr = 50;
     uint256 private mainApr = 20;
+    uint256 private stakers = 0;
 
     mapping(address => User) private users;
     mapping(uint256 => History) private histories;
@@ -86,6 +87,7 @@ contract LSDLpTokenStaking is LSDBase, ILSDLpTokenStaking {
             user.claimAmount = 0;
             user.earnedAmount = 0;
             user.lastTime = block.timestamp;
+            stakers++;
         } else {
             uint256 excessAmount = getClaimAmount(msg.sender);
             user.balance += _amount;
@@ -101,7 +103,7 @@ contract LSDLpTokenStaking is LSDBase, ILSDLpTokenStaking {
         ILSDToken lsdToken = ILSDToken(getContractAddress("lsdToken"));
         // check the balance
         require(lsdToken.balanceOf(msg.sender) >= _lsdTokenAmount);
-        
+
         // check allowance
         require(
             lsdToken.allowance(msg.sender, address(this)) >= _lsdTokenAmount,
@@ -150,6 +152,7 @@ contract LSDLpTokenStaking is LSDBase, ILSDLpTokenStaking {
             user.claimAmount = 0;
             user.earnedAmount = 0;
             user.lastTime = block.timestamp;
+            stakers++;
         } else {
             uint256 excessAmount = getClaimAmount(msg.sender);
             user.balance += liquidity;
@@ -207,9 +210,7 @@ contract LSDLpTokenStaking is LSDBase, ILSDLpTokenStaking {
             uint256 sum = 0;
             if (getIsBonusPeriod() == 0) i = historyCount;
             else i = historyCount - 1;
-            while (
-                ((i >= 1) && (histories[i - 1].startTime >= user.lastTime))
-            ) {
+            while (i >= 1) {
                 if (user.lastTime < histories[i - 1].startTime) {
                     if (j == 0) {
                         sum +=
@@ -232,6 +233,12 @@ contract LSDLpTokenStaking is LSDBase, ILSDLpTokenStaking {
                             histories[i - 1].apr;
                     }
                 }
+                if (
+                    ((user.lastTime > histories[i - 1].startTime) &&
+                        (user.lastTime <= histories[i - 1].endTime)) ||
+                    ((user.lastTime > histories[i - 1].startTime) &&
+                        (histories[i - 1].endTime == 0))
+                ) break;
                 i--;
                 j++;
             }
@@ -296,6 +303,10 @@ contract LSDLpTokenStaking is LSDBase, ILSDLpTokenStaking {
 
     function getMainApr() public view override returns (uint256) {
         return mainApr;
+    }
+
+    function getStakers() public view override returns(uint256){
+        return stakers;
     }
 
     /**@dev 

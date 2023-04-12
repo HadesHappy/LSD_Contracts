@@ -35,10 +35,11 @@ contract LSDTokenStaking is LSDBase, ILSDTokenStaking {
     uint256 private bonusPeriod = 15;
     uint256 private bonusApr = 50;
     uint256 private mainApr = 20;
+    uint256 private stakers = 0;
 
-    mapping(address => User) public users;
-    mapping(uint256 => History) public histories;
-    uint public historyCount;
+    mapping(address => User) private users;
+    mapping(uint256 => History) private histories;
+    uint private historyCount;
 
     uint256 private ONE_DAY_IN_SECS = 24 * 60 * 60;
 
@@ -85,6 +86,7 @@ contract LSDTokenStaking is LSDBase, ILSDTokenStaking {
             user.claimAmount = 0;
             user.earnedAmount = 0;
             user.lastTime = block.timestamp;
+            stakers++;
         } else {
             uint256 excessAmount = getClaimAmount(msg.sender);
             user.balance += _lsdTokenAmount;
@@ -136,9 +138,7 @@ contract LSDTokenStaking is LSDBase, ILSDTokenStaking {
             uint256 sum = 0;
             if (getIsBonusPeriod() == 0) i = historyCount;
             else i = historyCount - 1;
-            while (
-                ((i >= 1) && (histories[i - 1].startTime >= user.lastTime))
-            ) {
+            while (i >= 1) {
                 if (user.lastTime < histories[i - 1].startTime) {
                     if (j == 0) {
                         sum +=
@@ -161,6 +161,12 @@ contract LSDTokenStaking is LSDBase, ILSDTokenStaking {
                             histories[i - 1].apr;
                     }
                 }
+                if (
+                    ((user.lastTime > histories[i - 1].startTime) &&
+                        (user.lastTime <= histories[i - 1].endTime)) ||
+                    ((user.lastTime > histories[i - 1].startTime) &&
+                        (histories[i - 1].endTime == 0))
+                ) break;
                 i--;
                 j++;
             }
@@ -220,6 +226,10 @@ contract LSDTokenStaking is LSDBase, ILSDTokenStaking {
 
     function getMainApr() public view override returns (uint256) {
         return mainApr;
+    }
+
+    function getStakers() public view override returns (uint256) {
+        return stakers;
     }
 
     /**

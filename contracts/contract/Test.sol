@@ -31,7 +31,6 @@ contract Test {
     constructor() {
         historyCount = 1;
         histories[0] = History(block.timestamp, 0, 20, false);
-        users[msg.sender] = User(100, 0, block.timestamp, 0);
     }
 
     function getIsBonusPeriod() public view returns (uint256) {
@@ -42,6 +41,9 @@ contract Test {
         } else return 0;
     }
 
+    function stake(uint256 _amount) public {
+        users[msg.sender] = User(_amount, 0, block.timestamp, 0);
+    }
 
     // Get Claim Amount By LSD Staking
     function getClaimAmount(address _address) public view returns (uint256) {
@@ -52,9 +54,7 @@ contract Test {
             uint256 sum = 0;
             if (getIsBonusPeriod() == 0) i = historyCount;
             else i = historyCount - 1;
-            while (
-                ((i >= 1)&&(histories[i - 1].startTime >= user.lastTime))
-            ) {
+            while (i >= 1) {
                 if (user.lastTime < histories[i - 1].startTime) {
                     if (j == 0) {
                         sum +=
@@ -77,6 +77,11 @@ contract Test {
                             histories[i - 1].apr;
                     }
                 }
+                if (
+                    ((user.lastTime > histories[i - 1].startTime) &&
+                    (user.lastTime <= histories[i - 1].endTime)) || ((user.lastTime > histories[i - 1].startTime) &&
+                    (histories[i - 1].endTime == 0))
+                ) break;
                 i--;
                 j++;
             }

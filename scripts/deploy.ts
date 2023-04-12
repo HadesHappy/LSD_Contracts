@@ -8,7 +8,7 @@ async function main() {
   // const LsdDepositPool = await ethers.getContractFactory("LSDDepositPool");
   const LsdLpTokenStaking = await ethers.getContractFactory("LSDLpTokenStaking");
 
-  // const LsdTokenStaking = await ethers.getContractFactory("LSDTokenStaking");
+  const LsdTokenStaking = await ethers.getContractFactory("LSDTokenStaking");
   // const LsdTokenVault = await ethers.getContractFactory("LSDTokenVault");
   // tokens
   // const LsdTokenLSETH = await ethers.getContractFactory("LSDTokenLSETH");
@@ -25,7 +25,7 @@ async function main() {
   // const lsdDepositPool = await LsdDepositPool.deploy(lsdStorage.address);
   const lsdLpTokenStaking = await LsdLpTokenStaking.deploy("0xC1D358ad6580F232796262aAf3F2EE2FA5E9b484");
 
-  // const lsdTokenStaking = await LsdTokenStaking.deploy("0xC1D358ad6580F232796262aAf3F2EE2FA5E9b484");
+  const lsdTokenStaking = await LsdTokenStaking.deploy("0xC1D358ad6580F232796262aAf3F2EE2FA5E9b484");
   // const lsdTokenVault = await LsdTokenVault.deploy("0xC1D358ad6580F232796262aAf3F2EE2FA5E9b484");
 
   // const lsdTokenLSETH = await LsdTokenLSETH.deploy(lsdStorage.address);
@@ -39,7 +39,7 @@ async function main() {
   // console.log(`LSD Update Balance deployed to ${lsdUpdateBalance.address}`);
 
   // console.log(`LSD Deposit Pool deployed to ${lsdDepositPool.address}`);
-  // console.log(`LSD Staking Pool deployed to ${lsdTokenStaking.address}`);
+  console.log(`LSD Staking Pool deployed to ${lsdTokenStaking.address}`);
   // console.log(`LSD Token Vault deployed to ${lsdTokenVault.address}`);
   console.log(`LP Token Staking deployed to ${lsdLpTokenStaking.address}`);
 
