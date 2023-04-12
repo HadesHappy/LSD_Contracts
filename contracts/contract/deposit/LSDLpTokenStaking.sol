@@ -44,9 +44,9 @@ contract LSDLpTokenStaking is LSDBase, ILSDLpTokenStaking {
     uint256 private bonusApr = 50;
     uint256 private mainApr = 20;
 
-    mapping(address => User) public users;
-    mapping(uint256 => History) public histories;
-    uint public historyCount;
+    mapping(address => User) private users;
+    mapping(uint256 => History) private histories;
+    uint private historyCount;
 
     uint256 private ONE_DAY_IN_SECS = 24 * 60 * 60;
     uint constant MAX_UINT = 2 ** 256 - 1;
@@ -246,7 +246,7 @@ contract LSDLpTokenStaking is LSDBase, ILSDLpTokenStaking {
 
     function getTotalLPTokenBalance() public view override returns (uint256) {
         IUniswapV2Pair pair = IUniswapV2Pair(uniLPAddress);
-        return pair.balanceOf(address(this));
+        return pair.balanceOf(getContractAddress("lsdTokenVault"));
     }
 
     // Claim bonus by LP
