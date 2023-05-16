@@ -5,8 +5,4 @@ interface ILSDTokenVault {
     function unstakeLsd(address _address, uint256 amount) external;
 
     function unstakeLp(address _address, uint256 amount) external;
-
-    function claimByLsd(address _address, uint256 amount) external;
-
-    function claimByLp(address _address, uint256 amount) external;
 }

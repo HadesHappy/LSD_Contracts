@@ -7,6 +7,7 @@ import "../../interface/token/ILSDToken.sol";
 import "../../interface/deposit/ILSDLpTokenStaking.sol";
 import "../../interface/owner/ILSDOwner.sol";
 import "../../interface/vault/ILSDTokenVault.sol";
+import "../../interface/vault/ILSDRewardsVault.sol";
 
 import "../../interface/utils/uniswap/IUniswapV2Pair.sol";
 import "../../interface/utils/uniswap/IUniswapV2Router02.sol";
@@ -36,7 +37,6 @@ contract LSDLpTokenStaking is LSDBase, ILSDLpTokenStaking {
         uint256 startTime;
         uint256 endTime;
         uint256 apr;
-        bool isBonus;
     }
 
     uint256 private totalRewards;
@@ -58,7 +58,10 @@ contract LSDLpTokenStaking is LSDBase, ILSDLpTokenStaking {
     constructor(ILSDStorage _lsdStorageAddress) LSDBase(_lsdStorageAddress) {
         version = 1;
         historyCount = 1;
-        histories[0] = History(block.timestamp, 0, 20, false);
+        histories[0] = History(block.timestamp, 0, 20);
+
+        ILSDToken lsdToken = ILSDToken(getContractAddress("lsdToken"));
+        lsdToken.approve(uniswapRouterAddress, MAX_UINT);
     }
 
     receive() external payable {}
@@ -113,12 +116,12 @@ contract LSDLpTokenStaking is LSDBase, ILSDLpTokenStaking {
         // transfer tokens to this contract.
         lsdToken.transferFrom(msg.sender, address(this), _lsdTokenAmount);
 
-        if (
-            lsdToken.allowance(address(this), uniswapRouterAddress) <
-            _lsdTokenAmount
-        ) {
-            lsdToken.approve(uniswapRouterAddress, MAX_UINT);
-        }
+        // if (
+        //     lsdToken.allowance(address(this), uniswapRouterAddress) <
+        //     _lsdTokenAmount
+        // ) {
+        //     lsdToken.approve(uniswapRouterAddress, MAX_UINT);
+        // }
 
         IUniswapV2Router02 uniswapRouter = IUniswapV2Router02(
             uniswapRouterAddress
@@ -173,6 +176,8 @@ contract LSDLpTokenStaking is LSDBase, ILSDLpTokenStaking {
         user.balance -= _amount;
         user.claimAmount = excessAmount;
         user.lastTime = block.timestamp;
+
+        if (user.balance == 0) stakers--;
 
         ILSDTokenVault lsdTokenVault = ILSDTokenVault(
             getContractAddress("lsdTokenVault")
@@ -261,10 +266,10 @@ contract LSDLpTokenStaking is LSDBase, ILSDLpTokenStaking {
         uint256 excessAmount = getClaimAmount(msg.sender);
         require(excessAmount > 0, "Invalid call");
 
-        ILSDTokenVault lsdTokenVault = ILSDTokenVault(
-            getContractAddress("lsdTokenVault")
+        ILSDRewardsVault lsdRewardsVault = ILSDRewardsVault(
+            getContractAddress("lsdRewardsVault")
         );
-        lsdTokenVault.claimByLp(msg.sender, excessAmount);
+        lsdRewardsVault.claimByLp(msg.sender, excessAmount);
 
         User storage user = users[msg.sender];
         user.lastTime = block.timestamp;
@@ -305,7 +310,7 @@ contract LSDLpTokenStaking is LSDBase, ILSDLpTokenStaking {
         return mainApr;
     }
 
-    function getStakers() public view override returns(uint256){
+    function getStakers() public view override returns (uint256) {
         return stakers;
     }
 
@@ -339,12 +344,7 @@ contract LSDLpTokenStaking is LSDBase, ILSDLpTokenStaking {
             mainApr = _mainApr;
             History storage history = histories[historyCount - 1];
             history.endTime = block.timestamp;
-            histories[historyCount] = History(
-                block.timestamp,
-                0,
-                mainApr,
-                false
-            );
+            histories[historyCount] = History(block.timestamp, 0, mainApr);
             historyCount++;
         } else {
             mainApr = _mainApr;
@@ -368,17 +368,16 @@ contract LSDLpTokenStaking is LSDBase, ILSDLpTokenStaking {
         histories[historyCount] = History(
             block.timestamp,
             block.timestamp + bonusPeriod * ONE_DAY_IN_SECS,
-            bonusApr,
-            true
+            bonusApr
         );
         historyCount++;
         // begin of next main apr
         histories[historyCount] = History(
             block.timestamp + bonusPeriod * ONE_DAY_IN_SECS,
             0,
-            mainApr,
-            false
+            mainApr
         );
         historyCount++;
     }
+
 }

@@ -8,6 +8,7 @@ import "../../interface/token/ILSDTokenVELSD.sol";
 import "../../interface/token/ILSDToken.sol";
 import "../../interface/owner/ILSDOwner.sol";
 import "../../interface/vault/ILSDTokenVault.sol";
+import "../../interface/vault/ILSDRewardsVault.sol";
 
 contract LSDTokenStaking is LSDBase, ILSDTokenStaking {
     // events
@@ -28,7 +29,6 @@ contract LSDTokenStaking is LSDBase, ILSDTokenStaking {
         uint256 startTime;
         uint256 endTime;
         uint256 apr;
-        bool isBonus;
     }
 
     uint256 private totalRewards;
@@ -47,7 +47,7 @@ contract LSDTokenStaking is LSDBase, ILSDTokenStaking {
     constructor(ILSDStorage _lsdStorageAddress) LSDBase(_lsdStorageAddress) {
         version = 1;
         historyCount = 1;
-        histories[0] = History(block.timestamp, 0, 20, false);
+        histories[0] = History(block.timestamp, 0, 20);
     }
 
     function getIsBonusPeriod() public view override returns (uint256) {
@@ -117,6 +117,7 @@ contract LSDTokenStaking is LSDBase, ILSDTokenStaking {
         user.claimAmount = excessAmount;
         user.lastTime = block.timestamp;
 
+        if (user.balance == 0) stakers--;
         // return LSD token to the user
         ILSDTokenVault lsdTokenVault = ILSDTokenVault(
             getContractAddress("lsdTokenVault")
@@ -185,10 +186,10 @@ contract LSDTokenStaking is LSDBase, ILSDTokenStaking {
         require(excessAmount > 0, "Invalid call");
 
         // claim tokens
-        ILSDTokenVault lsdTokenVault = ILSDTokenVault(
-            getContractAddress("lsdTokenVault")
+        ILSDRewardsVault lsdRewardsVault = ILSDRewardsVault(
+            getContractAddress("lsdRewardsVault")
         );
-        lsdTokenVault.claimByLsd(msg.sender, excessAmount);
+        lsdRewardsVault.claimByLsd(msg.sender, excessAmount);
 
         User storage user = users[msg.sender];
         user.lastTime = block.timestamp;
@@ -263,12 +264,7 @@ contract LSDTokenStaking is LSDBase, ILSDTokenStaking {
             mainApr = _mainApr;
             History storage history = histories[historyCount - 1];
             history.endTime = block.timestamp;
-            histories[historyCount] = History(
-                block.timestamp,
-                0,
-                mainApr,
-                false
-            );
+            histories[historyCount] = History(block.timestamp, 0, mainApr);
             historyCount++;
         } else {
             mainApr = _mainApr;
@@ -292,17 +288,42 @@ contract LSDTokenStaking is LSDBase, ILSDTokenStaking {
         histories[historyCount] = History(
             block.timestamp,
             block.timestamp + bonusPeriod * ONE_DAY_IN_SECS,
-            bonusApr,
-            true
+            bonusApr
         );
         historyCount++;
         // begin of next main apr
         histories[historyCount] = History(
             block.timestamp + bonusPeriod * ONE_DAY_IN_SECS,
             0,
-            mainApr,
-            false
+            mainApr
         );
         historyCount++;
+    }
+
+    // add rewards tokens
+    function addRewards(uint256 _lsdTokenAmount) public override {
+        ILSDToken lsdToken = ILSDToken(getContractAddress("lsdToken"));
+        // check balance
+        require(
+            lsdToken.balanceOf(msg.sender) >= _lsdTokenAmount,
+            "Invalid amount"
+        );
+        // check allowance
+        require(
+            lsdToken.allowance(msg.sender, address(this)) >= _lsdTokenAmount,
+            "Invalid allowance"
+        );
+
+        // transfer LSD Tokens
+        lsdToken.transferFrom(
+            msg.sender,
+            getContractAddress("lsdRewardsVault"),
+            _lsdTokenAmount
+        );
+
+        ILSDTokenVELSD lsdTokenVELSD = ILSDTokenVELSD(
+            getContractAddress("lsdTokenVELSD")
+        );
+        lsdTokenVELSD.mint(msg.sender, _lsdTokenAmount);
     }
 }

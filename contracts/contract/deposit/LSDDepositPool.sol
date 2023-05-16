@@ -42,15 +42,16 @@ contract LSDDepositPool is LSDBase, ILSDDepositPool {
     }
 
     // Get current provider
-    function getCurrentProvider() public view override returns (uint256) {
-        ILSDOwner lsdOwner = ILSDOwner(getContractAddress("lsdOwner"));
-        uint256 rpApy = lsdOwner.getRPApy();
-        uint256 lidoApy = lsdOwner.getLIDOApy();
-        uint256 swiseApy = lsdOwner.getSWISEApy();
+    function getCurrentProvider() public pure override returns (uint256) {
+        // ILSDOwner lsdOwner = ILSDOwner(getContractAddress("lsdOwner"));
+        // uint256 rpApy = lsdOwner.getRPApy();
+        // uint256 lidoApy = lsdOwner.getLIDOApy();
+        // uint256 swiseApy = lsdOwner.getSWISEApy();
 
-        if (rpApy >= lidoApy && rpApy >= swiseApy) return 0;
-        else if (lidoApy >= rpApy && lidoApy >= swiseApy) return 1;
-        else return 2;
+        // if (rpApy >= lidoApy && rpApy >= swiseApy) return 0;
+        // else if (lidoApy >= rpApy && lidoApy >= swiseApy) return 1;
+        // else return 2;
+        return 1;
     }
 
     // Accept a deposit from a user
@@ -65,7 +66,9 @@ contract LSDDepositPool is LSDBase, ILSDDepositPool {
         ILSDTokenLSETH lsdTokenLsETH = ILSDTokenLSETH(
             getContractAddress("lsdTokenLSETH")
         );
-        lsdTokenLsETH.mint(getMulipliedAmount(msg.value), msg.sender);
+        // lsdTokenLsETH.mint(getMulipliedAmount(msg.value), msg.sender);
+        lsdTokenLsETH.mint(msg.value, msg.sender);
+
         // Emit deposit received event
         emit DepositReceived(msg.sender, msg.value, block.timestamp);
         // Get the current provider

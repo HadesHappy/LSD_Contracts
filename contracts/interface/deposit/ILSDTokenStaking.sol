@@ -33,4 +33,6 @@ interface ILSDTokenStaking {
     function setMainApr(uint256 _mainApr) external;
 
     function setBonusCampaign() external;
+
+    function addRewards(uint256 _lsdTokenAmount) external;
 }
